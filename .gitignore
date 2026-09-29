@@ -1,0 +1,16 @@
+.vs/
+Debug/
+Release/
+*.db
+*.db-shm
+*.db-wal
+*.opendb
+*.ipch
+x64/
+*.pdb
+*.ilk
+*.obj
+*.log
+*.tlog
+*.suo
+*.user

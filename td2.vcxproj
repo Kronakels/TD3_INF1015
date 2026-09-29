@@ -16,7 +16,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -46,13 +46,16 @@
   <ItemGroup>
     <ClCompile Include="bibliotheque_cours\bibliotheque_cours.cpp" />
     <ClCompile Include="bibliotheque_cours\verification_allocation.cpp" />
-    <ClCompile Include="td2.cpp" />
+    <ClCompile Include="td3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\bibliotheque_cours.hpp" />
     <ClInclude Include="include\debogage_memoire.hpp" />
     <ClInclude Include="structures.hpp" />
     <ClInclude Include="include\verification_allocation.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
