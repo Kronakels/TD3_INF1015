@@ -3,6 +3,7 @@
 
 #include <string>
 #include <span>
+#include <memory>
 
 struct Groupe; struct Musicien; // Permet d'utiliser les types alors qu'ils seront définis après.
 
@@ -23,10 +24,10 @@ private:
 	Groupe** elements_; // Pointeur vers un tableau de Groupe*, chaque Groupe* pointant vers un Groupe.
 };
 
-struct ListeMusiciens 
+struct ListeMusiciens
 {
 	int capacite, nElements;
-	Musicien** elements; // Pointeur vers un tableau de Musicien*, chaque Musicien* pointant vers un Musicien.
+	std::unique_ptr<Musicien* []> elements; // Pointeur vers un tableau de Musicien*, chaque Musicien* pointant vers un Musicien.
 };
 
 struct Groupe
