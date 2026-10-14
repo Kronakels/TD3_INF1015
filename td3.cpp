@@ -106,18 +106,18 @@ ListeMusiciens::ListeMusiciens() :
 }
 
 ListeMusiciens::ListeMusiciens(int capacite) :
-capacite_(capacite), nElements_(0), elements_(make_unique<Musicien* []>(capacite))
+capacite_(capacite), nElements_(0), elements_(make_unique<shared_ptr<Musicien>[]>(capacite))
 {
 }
 
-void ListeMusiciens::ajouter(Musicien* musicien)
+void ListeMusiciens::ajouter(const shared_ptr<Musicien>& musicien)
 {
 	elements_[nElements_++] = musicien;
 }
 
-span<Musicien* const> ListeMusiciens::getMusiciens() const
+span<const shared_ptr<Musicien>> ListeMusiciens::getMusiciens() const
 {
-	return span<Musicien* const>(elements_.get(), nElements_);
+	return span<const shared_ptr<Musicien>>(elements_.get(), nElements_);
 }
 //TODO:fait Une fonction pour ajouter un Groupe à une ListeGroupes, le groupe existant déjà; on veut uniquement ajouter le pointeur vers le groupe existant.  Cette fonction doit doubler la taille du tableau alloué, avec au minimum un élément, dans le cas où la capacité est insuffisante pour ajouter l'élément.  Il faut alors allouer un nouveau tableau plus grand, copier ce qu'il y avait dans l'ancien, et éliminer l'ancien trop petit.  Cette fonction ne doit copier aucun Groupe ni Musicien, elle doit copier uniquement des pointeurs.
 void ListeGroupes::ajouter(Groupe* pointeurGroupe)
@@ -152,29 +152,29 @@ void ListeGroupes::retirer(const Groupe* pointeurGroupe)
 	}
 }
 //TODO:fait Une fonction pour trouver un Musicien par son nom dans une ListeGroupes, qui retourne un pointeur vers le musicien, ou nullptr si le musicien n'est pas trouvé.  Devrait utiliser span.
-Musicien* ListeGroupes::trouverMusicien(const string& nom) const
+shared_ptr<Musicien> ListeGroupes::trouverMusicien(const string& nom) const
 {
 	for (const Groupe* groupe: getGroupes()){
-		for (Musicien* musicien : groupe->membres.getMusiciens()){
+		for (const auto& musicien : groupe->membres.getMusiciens()){
 			if (musicien->nom == nom) return musicien;
 		}
 	}
 	return nullptr;
 }
 //TODO:fait Compléter les fonctions pour lire le fichier et créer/allouer une ListeGroupes.  La ListeGroupes devra être passée entre les fonctions, pour vérifier l'existence d'un Musicien avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
-Musicien* lireMusicien(istream& fichier, const ListeGroupes& liste) 
+shared_ptr<Musicien> lireMusicien(istream& fichier, const ListeGroupes& liste) 
 {
 	Musicien musicien = {};
 	musicien.nom = lireString(fichier);
 	musicien.pays = lireString(fichier);
 	musicien.anneeNaissance = lireUintTailleVariable(fichier);
-	Musicien* musicienExistant = liste.trouverMusicien(musicien.nom);
+	shared_ptr<Musicien> musicienExistant = liste.trouverMusicien(musicien.nom);
 
 	if (musicienExistant != nullptr) return musicienExistant;
 
-	Musicien* nouveauMusicien = new Musicien(musicien);
+	
 	cout << "Le musicien " << musicien.nom << " à été créé." << endl;
-	return nouveauMusicien; //TODO:fait Retourner un pointeur soit vers un musicien existant ou un nouveau musicien ayant les bonnes informations, selon si le musicien existait déjà.  Pour fins de débogage, affichez les noms des membres crées; vous ne devriez pas voir le même nom de musicien affiché deux fois pour la création.
+	return shared_ptr<Musicien>(new Musicien(musicien)); //TODO:fait Retourner un pointeur soit vers un musicien existant ou un nouveau musicien ayant les bonnes informations, selon si le musicien existait déjà.  Pour fins de débogage, affichez les noms des membres crées; vous ne devriez pas voir le même nom de musicien affiché deux fois pour la création.
 }
 
 Groupe* lireGroupe(istream& fichier, const ListeGroupes& liste)
@@ -189,9 +189,7 @@ Groupe* lireGroupe(istream& fichier, const ListeGroupes& liste)
 	cout << groupe->nom << endl;
 
 	for (int i : range(nMembres)) {
-		Musicien* musicien = lireMusicien(fichier, liste);
-		groupe->membres.ajouter(musicien);
-		musicien->joueDans.ajouter(groupe);
+		groupe->membres.ajouter(lireMusicien(fichier, liste));
 	}
 
 	return groupe; //TODO: Retourner le pointeur vers le nouveau groupe.
@@ -217,16 +215,6 @@ ListeGroupes creerListe(string nomFichier)
 //TODO: Une fonction pour détruire un groupe (relâcher toute la mémoire associée à ce groupe, et les membres qui ne jouent plus dans aucun groupes de la collection).  Noter qu'il faut enleve le groupe détruit des groupes dans lesquels jouent les membres.  Pour fins de débogage, affichez les noms des membres lors de leur destruction.
 void detruireGroupe(Groupe* groupe)
 {
-	for (Musicien* ptrMusicien : groupe->membres.getMusiciens()){
-		ListeGroupes& groupesJoueDans = ptrMusicien->joueDans;
-		groupesJoueDans.retirer(groupe);
-		if (groupesJoueDans.getTaille() == 0) {
-			groupesJoueDans.libererMemoire();
-			cout << (*ptrMusicien).nom << " a été supprimé." << endl;
-			delete ptrMusicien;
-
-		}
-	}
 	delete groupe;
 }
 //TODO: Une fonction pour détruire une ListeGroupes et tous les groupes qu'elle contient.
@@ -247,7 +235,7 @@ void afficherMusicien(const Musicien& musicien)
 
 void afficherGroupe(const Groupe& groupe) {
 	cout << groupe.nom << " (" << groupe.genre << ", " << groupe.anneeFormation << ")" << endl;
-	for (const Musicien* musicien : groupe.membres.getMusiciens()) {
+	for (const auto& musicien : groupe.membres.getMusiciens()) {
 		afficherMusicien(*musicien);
 	}
 }
@@ -266,15 +254,15 @@ void afficherListeGroupes(const ListeGroupes& listeGroupes)
 	}
 }
 
-void afficherGroupesMusicien(const ListeGroupes& listeGroupes, const string& nomMusicien)
-{
+//void afficherGroupesMusicien(const ListeGroupes& listeGroupes, const string& nomMusicien)
+//{
 	//TODO: Utiliser votre fonction pour trouver le musicien (au lieu de le mettre à nullptr).
-	const Musicien* musicien = listeGroupes.trouverMusicien(nomMusicien);
-	if (musicien == nullptr)
-		cout << "Aucun musicien de ce nom" << endl;
-	else
-		afficherListeGroupes(musicien->joueDans);
-}
+//	const Musicien* musicien = listeGroupes.trouverMusicien(nomMusicien);
+//	if (musicien == nullptr)
+//		cout << "Aucun musicien de ce nom" << endl;
+//	else
+//		afficherListeGroupes(musicien->joueDans);
+//}
 
 int main()
 {
@@ -296,12 +284,12 @@ int main()
 	afficherListeGroupes(listeGroupes);
 	//TODO: Afficher la liste des groupes.  Il devrait y en avoir 7.
 
-	Musicien* daveGrohl = listeGroupes.trouverMusicien("Dave Grohl");
+	shared_ptr<Musicien> daveGrohl = listeGroupes.trouverMusicien("Dave Grohl");
 	daveGrohl->anneeNaissance = 1969;
 	//TODO: Modifier l'année de naissance de Dave Grohl pour être 1969 (a une valeur qui n'a pas de sens dans les données lues du fichier).  Vous ne pouvez pas supposer l'ordre des groupes et des membres dans les listes, il faut y aller par son nom.
 
 	cout << ligneDeSeparation << "Liste des groupes où Dave Grohl joue sont:" << endl;
-	afficherGroupesMusicien(listeGroupes, "Dave Grohl");
+	//afficherGroupesMusicien(listeGroupes, "Dave Grohl");
 	//TODO: Afficher la liste des groupe où Dave Grohl joue.  Il devrait y avoir Nirvana et Foo Fighters.
 
 	Groupe* nirvana = listeGroupes.getGroupes()[0];
@@ -312,7 +300,7 @@ int main()
 	cout << ligneDeSeparation << "Les groupes sont maintenant:" << endl;
 	afficherListeGroupes(listeGroupes);
 	//TODO: Afficher la liste des groupes.
-	afficherGroupesMusicien(listeGroupes, "Elvis Gratton");
+	//afficherGroupesMusicien(listeGroupes, "Elvis Gratton");
 	Groupe groupeInexistant = {}; //purement pour faire appel à chaque ligne
 	listeGroupes.retirer(&groupeInexistant);
 
