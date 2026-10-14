@@ -100,25 +100,6 @@ span<Groupe* const> ListeGroupes::getGroupes() const
 	return span<Groupe* const>(elements_, nElements_);
 }
 
-ListeMusiciens::ListeMusiciens() :
-	capacite_(0), nElements_(0), elements_(nullptr)
-{
-}
-
-ListeMusiciens::ListeMusiciens(int capacite) :
-capacite_(capacite), nElements_(0), elements_(make_unique<Musicien* []>(capacite))
-{
-}
-
-void ListeMusiciens::ajouter(Musicien* musicien)
-{
-	elements_[nElements_++] = musicien;
-}
-
-span<Musicien* const> ListeMusiciens::getMusiciens() const
-{
-	return span<Musicien* const>(elements_.get(), nElements_);
-}
 //TODO:fait Une fonction pour ajouter un Groupe à une ListeGroupes, le groupe existant déjà; on veut uniquement ajouter le pointeur vers le groupe existant.  Cette fonction doit doubler la taille du tableau alloué, avec au minimum un élément, dans le cas où la capacité est insuffisante pour ajouter l'élément.  Il faut alors allouer un nouveau tableau plus grand, copier ce qu'il y avait dans l'ancien, et éliminer l'ancien trop petit.  Cette fonction ne doit copier aucun Groupe ni Musicien, elle doit copier uniquement des pointeurs.
 void ListeGroupes::ajouter(Groupe* pointeurGroupe)
 {
@@ -154,8 +135,10 @@ void ListeGroupes::retirer(const Groupe* pointeurGroupe)
 //TODO:fait Une fonction pour trouver un Musicien par son nom dans une ListeGroupes, qui retourne un pointeur vers le musicien, ou nullptr si le musicien n'est pas trouvé.  Devrait utiliser span.
 Musicien* ListeGroupes::trouverMusicien(const string& nom) const
 {
-	for (const Groupe* groupe: getGroupes()){
-		for (Musicien* musicien : groupe->membres.getMusiciens()){
+	span<Groupe*> groupes(elements_, nElements_);
+	for (const Groupe* groupe : groupes) {
+		span <Musicien* const> membres(groupe->membres.elements.get(), groupe->membres.nElements);
+		for (Musicien* musicien : membres) {
 			if (musicien->nom == nom) return musicien;
 		}
 	}
@@ -179,18 +162,20 @@ Musicien* lireMusicien(istream& fichier, const ListeGroupes& liste)
 
 Groupe* lireGroupe(istream& fichier, const ListeGroupes& liste)
 {
-	string nom = lireString(fichier);
-	string genre = lireString(fichier);
-	int anneeFormation = lireUintTailleVariable(fichier);
-	int nMembres = lireUintTailleVariable(fichier);
-
-	Groupe* groupe = new Groupe{ nom, genre, anneeFormation, ListeMusiciens(nMembres) };
+	Groupe* groupe = new Groupe{};
+	groupe->nom = lireString(fichier);
+	groupe->genre = lireString(fichier);
+	groupe->anneeFormation = lireUintTailleVariable(fichier);
+	groupe->membres.nElements = 0;  //NOTE: Vous avez le droit d'allouer d'un coup le tableau pour les membres, sans faire de réallocation comme pour ListeGroupes.  Vous pouvez aussi copier-coller les fonctions d'allocation de ListeGroupes ci-dessus dans des nouvelles fonctions et faire un remplacement de Groupe par Musicien, pour réutiliser cette réallocation.
+	groupe->membres.capacite = lireUintTailleVariable(fichier);
+	groupe->membres.elements = make_unique<Musicien* []> (groupe->membres.capacite);
 
 	cout << groupe->nom << endl;
 
-	for (int i : range(nMembres)) {
-		Musicien* musicien = lireMusicien(fichier, liste);
-		groupe->membres.ajouter(musicien);
+	for (int i : range(groupe->membres.capacite)) {
+		Musicien* musicien = lireMusicien(fichier, liste); //TODO: Placer le musicien au bon endroit dans les membres du groupe.
+		groupe->membres.elements[i] = musicien;
+		groupe->membres.nElements++;
 		musicien->joueDans.ajouter(groupe);
 	}
 
@@ -217,7 +202,8 @@ ListeGroupes creerListe(string nomFichier)
 //TODO: Une fonction pour détruire un groupe (relâcher toute la mémoire associée à ce groupe, et les membres qui ne jouent plus dans aucun groupes de la collection).  Noter qu'il faut enleve le groupe détruit des groupes dans lesquels jouent les membres.  Pour fins de débogage, affichez les noms des membres lors de leur destruction.
 void detruireGroupe(Groupe* groupe)
 {
-	for (Musicien* ptrMusicien : groupe->membres.getMusiciens()){
+	span<Musicien*> tableauMusiciens(groupe->membres.elements.get(), groupe->membres.nElements);
+	for (Musicien* ptrMusicien : tableauMusiciens){
 		ListeGroupes& groupesJoueDans = ptrMusicien->joueDans;
 		groupesJoueDans.retirer(groupe);
 		if (groupesJoueDans.getTaille() == 0) {
@@ -238,19 +224,27 @@ void detruireListeGroupes(ListeGroupes& listeGroupes)
 	listeGroupes.libererMemoire();
 }
 
-void afficherMusicien(const Musicien& musicien)
+void afficherMusicien(ostream& o, const Musicien& musicien)
 {
-	cout << "  " << musicien.nom << ", " << musicien.pays << ", " << musicien.anneeNaissance << endl;
+	o << "  " << musicien.nom << ", " << musicien.pays << ", " << musicien.anneeNaissance << endl;
 }
 
 //TODO: Une fonction pour afficher un groupe avec tous ses membres (en utilisant la fonction afficherMusicien ci-dessus).
 
-void afficherGroupe(const Groupe& groupe) {
-	cout << groupe.nom << " (" << groupe.genre << ", " << groupe.anneeFormation << ")" << endl;
-	for (const Musicien* musicien : groupe.membres.getMusiciens()) {
-		afficherMusicien(*musicien);
-	}
+span<Musicien* const> ListeMusiciens::getMusiciens() const
+{
+	span<Musicien* const> (elements_.get(), nElements_);
 }
+ostream& operator<< (ostream& o, const Groupe& groupe)
+{
+	o << groupe.nom << " (" << groupe.genre << ", " << groupe.anneeFormation << ")" << endl;
+	
+	for (const Musicien* musicien : groupe.membres.getMusiciens()) {
+		afficherMusicien(o, *musicien);
+	}
+	return o;
+}
+
 
 void afficherListeGroupes(const ListeGroupes& listeGroupes)
 {
