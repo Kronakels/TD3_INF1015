@@ -24,10 +24,16 @@ private:
 	Groupe** elements_; // Pointeur vers un tableau de Groupe*, chaque Groupe* pointant vers un Groupe.
 };
 
-struct ListeMusiciens
+class ListeMusiciens
 {
-	int capacite, nElements;
-	std::unique_ptr<Musicien* []> elements; // Pointeur vers un tableau de Musicien*, chaque Musicien* pointant vers un Musicien.
+public:
+	ListeMusiciens();
+	explicit ListeMusiciens(int capacite);
+	void ajouter(Musicien* musicien);
+	std::span<Musicien* const> getMusiciens() const;
+private:
+	int capacite_, nElements_;
+	std::unique_ptr<Musicien* []> elements_;
 };
 
 struct Groupe
