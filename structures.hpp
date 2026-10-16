@@ -7,7 +7,7 @@
 
 struct Groupe; struct Musicien; // Permet d'utiliser les types alors qu'ils seront définis après.
 
-class ListeGroupes 
+class ListeGroupes
 {
 public:
 	ListeGroupes();
@@ -15,7 +15,7 @@ public:
 	void ajouter(Groupe* groupe);
 	void retirer(const Groupe* groupe);
 	void libererMemoire();
-	Musicien* trouverMusicien(const std::string& nom) const;
+	std::shared_ptr<Musicien> trouverMusicien(const std::string& nom) const;
 	int getTaille() const;
 	int getCapacite() const;
 	std::span<Groupe* const> getGroupes() const;
@@ -29,22 +29,23 @@ class ListeMusiciens
 public:
 	ListeMusiciens();
 	explicit ListeMusiciens(int capacite);
-	void ajouter(Musicien* musicien);
-	std::span<Musicien* const> getMusiciens() const;
+	void ajouter(const std::shared_ptr<Musicien>& musicien);
+	std::span<const std::shared_ptr<Musicien>> getMusiciens() const;
 private:
 	int capacite_, nElements_;
-	std::unique_ptr<Musicien* []> elements_;
+	std::unique_ptr<std::shared_ptr<Musicien>[]> elements_;
 };
 
 struct Groupe
 {
 	std::string nom, genre; // Nom du groupe et genre de musique qu'il fait principalement.
-	int anneeFormation; // Année où le groupe a été formé initialement.
+	int anneeFormation = 0; // Année où le groupe a été formé initialement.
 	ListeMusiciens membres;
 };
 
 struct Musicien
 {
-	std::string nom, pays; int anneeNaissance;
+	std::string nom, pays;
+	int anneeNaissance = 0;
 	ListeGroupes joueDans;
 };
