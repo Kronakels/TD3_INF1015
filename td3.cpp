@@ -1,4 +1,4 @@
-﻿﻿/*
+﻿/*
 * Programme qui permet de gérer des groupes de musiciens et des musiciens grâce
 * à l'allocation dynamique et aux classes.
 * \file   td3.cpp
@@ -18,6 +18,7 @@
 #include <limits>
 #include <algorithm>
 #include <span>
+#include <functional>
 
 #include "cppitertools/range.hpp"
 
@@ -95,6 +96,16 @@ int ListeGroupes::getCapacite() const
 	return capacite_;
 }
 
+Groupe* ListeGroupes::trouverGroupe(const std::function<bool(const Groupe*)>& critere) const
+{
+	for (Groupe* groupe : getGroupes()) {
+		if (critere(groupe))
+			return groupe;
+	}
+	return nullptr;
+}
+
+
 span<Groupe* const> ListeGroupes::getGroupes() const
 {
 	return span<Groupe* const>(elements_, nElements_);
@@ -114,6 +125,7 @@ void ListeMusiciens::ajouter(const shared_ptr<Musicien>& musicien)
 {
 	elements_[nElements_++] = musicien;
 }
+
 
 span<const shared_ptr<Musicien>> ListeMusiciens::getMusiciens() const
 {
@@ -299,7 +311,9 @@ int main()
 	//cout << ligneDeSeparation << "Liste des groupes où Dave Grohl joue sont:" << endl;
 	//afficherGroupesMusicien(listeGroupes, "Dave Grohl");
 	//TODO: Afficher la liste des groupe où Dave Grohl joue.  Il devrait y avoir Nirvana et Foo Fighters.
-
+	Groupe* resultat = listeGroupes.trouverGroupe([](const Groupe* g) {return g->anneeFormation == 1985;});
+	afficherGroupe(*resultat);
+	
 	Groupe* nirvana = listeGroupes.getGroupes()[0];
 	listeGroupes.retirer(nirvana);
 	detruireGroupe(nirvana);
@@ -311,6 +325,7 @@ int main()
 	//afficherGroupesMusicien(listeGroupes, "Elvis Gratton");
 	Groupe groupeInexistant = {}; //purement pour faire appel à chaque ligne
 	listeGroupes.retirer(&groupeInexistant);
+	
 
 	//TODO: Faire les appels qui manquent pour avoir 0% de lignes non exécutées dans le programme (aucune ligne rouge dans la couverture de code; c'est normal que les lignes de "new" et "delete" soient jaunes).  Vous avez aussi le droit d'effacer les lignes du programmes qui ne sont pas exécutée, si finalement vous pensez qu'elle ne sont pas utiles.
 	detruireListeGroupes(listeGroupes);

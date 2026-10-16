@@ -4,6 +4,7 @@
 #include <string>
 #include <span>
 #include <memory>
+#include <functional>
 
 struct Groupe; struct Musicien; // Permet d'utiliser les types alors qu'ils seront définis après.
 
@@ -16,6 +17,7 @@ public:
 	void retirer(const Groupe* groupe);
 	void libererMemoire();
 	std::shared_ptr<Musicien> trouverMusicien(const std::string& nom) const;
+	Groupe* trouverGroupe(const std::function<bool(const Groupe*)>& critere) const;
 	int getTaille() const;
 	int getCapacite() const;
 	std::span<Groupe* const> getGroupes() const;
