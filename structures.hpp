@@ -47,5 +47,5 @@ struct Musicien
 {
 	std::string nom, pays;
 	int anneeNaissance = 0;
-	ListeGroupes joueDans;
+	//ListeGroupes joueDans;
 };

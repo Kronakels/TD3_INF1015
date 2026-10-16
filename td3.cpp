@@ -191,7 +191,6 @@ Groupe* lireGroupe(istream& fichier, const ListeGroupes& liste)
 	for (int i : range(nMembres)) {
 		shared_ptr<Musicien> musicien = lireMusicien(fichier, liste);
 		groupe->membres.ajouter(musicien);
-		musicien->joueDans.ajouter(groupe);
 	}
 
 	return groupe; //TODO: Retourner le pointeur vers le nouveau groupe.
@@ -217,13 +216,6 @@ ListeGroupes creerListe(string nomFichier)
 //TODO: Une fonction pour détruire un groupe (relâcher toute la mémoire associée à ce groupe, et les membres qui ne jouent plus dans aucun groupes de la collection).  Noter qu'il faut enleve le groupe détruit des groupes dans lesquels jouent les membres.  Pour fins de débogage, affichez les noms des membres lors de leur destruction.
 void detruireGroupe(Groupe* groupe)
 {
-	for (const auto& musicien : groupe->membres.getMusiciens()) {
-		musicien->joueDans.retirer(groupe);
-		if (musicien->joueDans.getTaille() == 0) {
-			cout << musicien->nom << " a été supprimé." << endl;
-			musicien->joueDans.libererMemoire();
-		}
-	}
 	delete groupe;
 }
 //TODO: Une fonction pour détruire une ListeGroupes et tous les groupes qu'elle contient.
@@ -270,15 +262,15 @@ void afficherListeGroupes(const ListeGroupes& listeGroupes)
 	}
 }
 
-void afficherGroupesMusicien(const ListeGroupes& listeGroupes, const string& nomMusicien)
-{
+//void afficherGroupesMusicien(const ListeGroupes& listeGroupes, const string& nomMusicien)
+//{
 	//TODO: Utiliser votre fonction pour trouver le musicien (au lieu de le mettre à nullptr).
-	shared_ptr<Musicien> musicien = listeGroupes.trouverMusicien(nomMusicien);
-	if (musicien == nullptr)
-		cout << "Aucun musicien de ce nom" << endl;
-	else
-		afficherListeGroupes(musicien->joueDans);
-}
+	//shared_ptr<Musicien> musicien = listeGroupes.trouverMusicien(nomMusicien);
+	//if (musicien == nullptr)
+		//cout << "Aucun musicien de ce nom" << endl;
+//	else
+	//	afficherListeGroupes(musicien->joueDans);
+//}
 
 int main()
 {
@@ -304,8 +296,8 @@ int main()
 	daveGrohl->anneeNaissance = 1969;
 	//TODO: Modifier l'année de naissance de Dave Grohl pour être 1969 (a une valeur qui n'a pas de sens dans les données lues du fichier).  Vous ne pouvez pas supposer l'ordre des groupes et des membres dans les listes, il faut y aller par son nom.
 
-	cout << ligneDeSeparation << "Liste des groupes où Dave Grohl joue sont:" << endl;
-	afficherGroupesMusicien(listeGroupes, "Dave Grohl");
+	//cout << ligneDeSeparation << "Liste des groupes où Dave Grohl joue sont:" << endl;
+	//afficherGroupesMusicien(listeGroupes, "Dave Grohl");
 	//TODO: Afficher la liste des groupe où Dave Grohl joue.  Il devrait y avoir Nirvana et Foo Fighters.
 
 	Groupe* nirvana = listeGroupes.getGroupes()[0];
@@ -316,7 +308,7 @@ int main()
 	cout << ligneDeSeparation << "Les groupes sont maintenant:" << endl;
 	afficherListeGroupes(listeGroupes);
 	//TODO: Afficher la liste des groupes.
-	afficherGroupesMusicien(listeGroupes, "Elvis Gratton");
+	//afficherGroupesMusicien(listeGroupes, "Elvis Gratton");
 	Groupe groupeInexistant = {}; //purement pour faire appel à chaque ligne
 	listeGroupes.retirer(&groupeInexistant);
 
