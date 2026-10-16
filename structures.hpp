@@ -7,7 +7,7 @@
 
 struct Groupe; struct Musicien; // Permet d'utiliser les types alors qu'ils seront définis après.
 
-class ListeGroupes 
+class ListeGroupes
 {
 public:
 	ListeGroupes();
@@ -28,14 +28,14 @@ class ListeMusiciens
 {
 public:
 	ListeMusiciens();
-	explicit ListeMusiciens(int capacite); 
+	explicit ListeMusiciens(int capacite);
 	void ajouter(const std::shared_ptr<Musicien>& musicien);
 	std::span<const std::shared_ptr<Musicien>> getMusiciens() const;
 private:
 	int capacite_, nElements_;
 	std::unique_ptr<std::shared_ptr<Musicien>[]> elements_;
 };
- 
+
 struct Groupe
 {
 	std::string nom, genre; // Nom du groupe et genre de musique qu'il fait principalement.
@@ -45,7 +45,7 @@ struct Groupe
 
 struct Musicien
 {
-	std::string nom, pays; 
+	std::string nom, pays;
 	int anneeNaissance = 0;
-	//ListeGroupes joueDans;
+	ListeGroupes joueDans;
 };
