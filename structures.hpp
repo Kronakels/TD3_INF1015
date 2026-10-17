@@ -4,6 +4,7 @@
 #include <string>
 #include <span>
 #include <memory>
+#include <functional>
 
 struct Groupe; struct Musicien; // Permet d'utiliser les types alors qu'ils seront définis après.
 
@@ -16,6 +17,7 @@ public:
 	void retirer(const Groupe* groupe);
 	void libererMemoire();
 	std::shared_ptr<Musicien> trouverMusicien(const std::string& nom) const;
+	Groupe* trouverGroupe(const std::function<bool(const Groupe*)>& critere) const;
 	int getTaille() const;
 	int getCapacite() const;
 	std::span<Groupe* const> getGroupes() const;
@@ -29,10 +31,13 @@ class ListeMusiciens
 public:
 	ListeMusiciens();
 	explicit ListeMusiciens(int capacite);
+	ListeMusiciens(const ListeMusiciens& autre);
 	void ajouter(const std::shared_ptr<Musicien>& musicien);
 	std::span<const std::shared_ptr<Musicien>> getMusiciens() const;
+	std::shared_ptr<Musicien>& operator[](int indice);
 private:
-	int capacite_, nElements_;
+	int capacite_ = 0;
+	int nElements_ = 0;
 	std::unique_ptr<std::shared_ptr<Musicien>[]> elements_;
 };
 
@@ -47,5 +52,5 @@ struct Musicien
 {
 	std::string nom, pays;
 	int anneeNaissance = 0;
-	ListeGroupes joueDans;
+	//ListeGroupes joueDans;
 };
