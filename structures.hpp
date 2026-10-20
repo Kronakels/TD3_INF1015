@@ -31,6 +31,7 @@ class ListeMusiciens
 public:
 	ListeMusiciens();
 	explicit ListeMusiciens(int capacite);
+	ListeMusiciens(const ListeMusiciens& autre);
 	void ajouter(const std::shared_ptr<Musicien>& musicien);
 	std::span<const std::shared_ptr<Musicien>> getMusiciens() const;
 private:

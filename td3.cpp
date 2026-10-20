@@ -121,6 +121,16 @@ ListeMusiciens::ListeMusiciens(int capacite) :
 {
 }
 
+// Faire un deep copy des attributs de ListeMusiciens car on ne peut pas copier un unique_ptr
+ListeMusiciens::ListeMusiciens(const ListeMusiciens& autre) :
+	capacite_(autre.capacite_), 
+	nElements_(autre.nElements_),
+	elements_(make_unique<shared_ptr<Musicien>[]>(autre.capacite_))
+{
+	for (int i : range(nElements_))
+		elements_[i] = autre.elements_[i];
+}
+
 void ListeMusiciens::ajouter(const shared_ptr<Musicien>& musicien)
 {
 	elements_[nElements_++] = musicien;
@@ -256,10 +266,7 @@ ostream& operator<< (ostream& o, const Groupe& groupe)
 	return o;
 }
 
-void afficherGroupe(const Groupe& groupe)
-{
-	cout << groupe;
-}
+
 void afficherListeGroupes(const ListeGroupes& listeGroupes)
 {
 	//TODO: Utiliser des caractères Unicode pour définir la ligne de séparation (différente des autres lignes de séparations dans ce progamme).
@@ -269,7 +276,7 @@ void afficherListeGroupes(const ListeGroupes& listeGroupes)
 	span<Groupe* const> groupes = listeGroupes.getGroupes();
 	for (const Groupe* groupe : groupes) {
 		//TODO: Afficher le groupe.
-		afficherGroupe(*groupe);
+		cout << (*groupe);
 		cout << ligneDeSeparation;
 	}
 }
@@ -297,7 +304,7 @@ int main()
 	ListeGroupes listeGroupes = creerListe("groupes.bin");
 
 	cout << ligneDeSeparation << "Le premier groupe de la liste est:" << endl;
-	afficherGroupe(*listeGroupes.getGroupes()[0]);
+	cout << (*listeGroupes.getGroupes()[0]);
 	//TODO: Afficher le premier groupe de la liste.  Devrait être Nirvana.
 
 	cout << ligneDeSeparation << "Les groupes sont:" << endl;
@@ -312,7 +319,12 @@ int main()
 	//afficherGroupesMusicien(listeGroupes, "Dave Grohl");
 	//TODO: Afficher la liste des groupe où Dave Grohl joue.  Il devrait y avoir Nirvana et Foo Fighters.
 	Groupe* resultat = listeGroupes.trouverGroupe([](const Groupe* g) {return g->anneeFormation == 1985;});
-	afficherGroupe(*resultat);
+	cout << (*resultat);
+
+	Groupe* nirvahead = new Groupe(*listeGroupes.trouverGroupe([](const Groupe* g) { return g->nom == "Nirvana"; }));
+	listeGroupes.ajouter(nirvahead);
+	nirvahead->nom = "Nirvahead";
+
 
 	Groupe* nirvana = listeGroupes.getGroupes()[0];
 	listeGroupes.retirer(nirvana);
