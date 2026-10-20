@@ -1,5 +1,6 @@
 ﻿/**
-* Programme qui permet de gérer des groupes de musiciens et des musiciens grâce à l'allocation dynamique et aux classes.
+* Programme qui permet de gérer des groupes de musiciens et des musiciens grâce
+* à l'allocation dynamique et aux classes.
 * \file   td3.cpp
 * \author Anthony Gingras et Vincent Tran
 * \date   26 septembre 2026
@@ -125,18 +126,6 @@ void ListeMusiciens::ajouter(const shared_ptr<Musicien>& musicien)
 	elements_[nElements_++] = musicien;
 }
 
-ListeMusiciens::ListeMusiciens(const ListeMusiciens& autre) :
-	capacite_(autre.capacite_), nElements_(autre.nElements_),
-	elements_(make_unique<shared_ptr<Musicien>[]>(autre.capacite_))
-{
-	for (int i : range(nElements_))
-		elements_[i] = autre.elements_[i];
-}
-
-shared_ptr<Musicien>& ListeMusiciens::operator[](int indice)
-{
-	return elements_[indice];
-}
 
 span<const shared_ptr<Musicien>> ListeMusiciens::getMusiciens() const
 {
@@ -267,7 +256,10 @@ ostream& operator<< (ostream& o, const Groupe& groupe)
 	return o;
 }
 
-
+void afficherGroupe(const Groupe& groupe)
+{
+	cout << groupe;
+}
 void afficherListeGroupes(const ListeGroupes& listeGroupes)
 {
 	//TODO: Utiliser des caractères Unicode pour définir la ligne de séparation (différente des autres lignes de séparations dans ce progamme).
@@ -277,7 +269,7 @@ void afficherListeGroupes(const ListeGroupes& listeGroupes)
 	span<Groupe* const> groupes = listeGroupes.getGroupes();
 	for (const Groupe* groupe : groupes) {
 		//TODO: Afficher le groupe.
-		cout << (*groupe);
+		afficherGroupe(*groupe);
 		cout << ligneDeSeparation;
 	}
 }
@@ -305,30 +297,23 @@ int main()
 	ListeGroupes listeGroupes = creerListe("groupes.bin");
 
 	cout << ligneDeSeparation << "Le premier groupe de la liste est:" << endl;
-	cout << (*listeGroupes.getGroupes()[0]);
+	afficherGroupe(*listeGroupes.getGroupes()[0]);
 	//TODO: Afficher le premier groupe de la liste.  Devrait être Nirvana.
 
 	cout << ligneDeSeparation << "Les groupes sont:" << endl;
 	afficherListeGroupes(listeGroupes);
 	//TODO: Afficher la liste des groupes.  Il devrait y en avoir 7.
 
+	shared_ptr<Musicien> daveGrohl = listeGroupes.trouverMusicien("Dave Grohl");
+	daveGrohl->anneeNaissance = 1969;
 	//TODO: Modifier l'année de naissance de Dave Grohl pour être 1969 (a une valeur qui n'a pas de sens dans les données lues du fichier).  Vous ne pouvez pas supposer l'ordre des groupes et des membres dans les listes, il faut y aller par son nom.
 
 	//cout << ligneDeSeparation << "Liste des groupes où Dave Grohl joue sont:" << endl;
 	//afficherGroupesMusicien(listeGroupes, "Dave Grohl");
 	//TODO: Afficher la liste des groupe où Dave Grohl joue.  Il devrait y avoir Nirvana et Foo Fighters.
 	Groupe* resultat = listeGroupes.trouverGroupe([](const Groupe* g) {return g->anneeFormation == 1985;});
-	cout << (*resultat);
+	afficherGroupe(*resultat);
 
-	//Partie pour chapitre 7-8
-	Groupe* nirvahead = new Groupe(*listeGroupes.trouverGroupe([](const Groupe* g) { return g->nom == "Nirvana"; }));
-	listeGroupes.ajouter(nirvahead);
-	nirvahead->nom = "Nirvahead";
-	nirvahead->membres[1] = listeGroupes.trouverMusicien("Colin Greenwood");
-	shared_ptr<Musicien> daveGrohl = listeGroupes.trouverMusicien("Dave Grohl");
-	daveGrohl->anneeNaissance = 1969;
-	cout << ligneDeSeparation << "Les groupes avec Nirvahead:" << endl;
-	afficherListeGroupes(listeGroupes);
 	Groupe* nirvana = listeGroupes.getGroupes()[0];
 	listeGroupes.retirer(nirvana);
 	detruireGroupe(nirvana);

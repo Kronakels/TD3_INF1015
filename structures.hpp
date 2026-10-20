@@ -31,13 +31,10 @@ class ListeMusiciens
 public:
 	ListeMusiciens();
 	explicit ListeMusiciens(int capacite);
-	ListeMusiciens(const ListeMusiciens& autre);
 	void ajouter(const std::shared_ptr<Musicien>& musicien);
 	std::span<const std::shared_ptr<Musicien>> getMusiciens() const;
-	std::shared_ptr<Musicien>& operator[](int indice);
 private:
-	int capacite_ = 0;
-	int nElements_ = 0;
+	int capacite_, nElements_;
 	std::unique_ptr<std::shared_ptr<Musicien>[]> elements_;
 };
 
