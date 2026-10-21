@@ -111,36 +111,7 @@ span<Groupe* const> ListeGroupes::getGroupes() const
 	return span<Groupe* const>(elements_, nElements_);
 }
 
-ListeMusiciens::ListeMusiciens() :
-	capacite_(0), nElements_(0), elements_(nullptr)
-{
-}
 
-ListeMusiciens::ListeMusiciens(int capacite) :
-	capacite_(capacite), nElements_(0), elements_(make_unique<shared_ptr<Musicien>[]>(capacite))
-{
-}
-
-// Faire un deep copy des attributs de ListeMusiciens car on ne peut pas copier un unique_ptr
-ListeMusiciens::ListeMusiciens(const ListeMusiciens& autre) :
-	capacite_(autre.capacite_), 
-	nElements_(autre.nElements_),
-	elements_(make_unique<shared_ptr<Musicien>[]>(autre.capacite_))
-{
-	for (int i : range(nElements_))
-		elements_[i] = autre.elements_[i];
-}
-
-void ListeMusiciens::ajouter(const shared_ptr<Musicien>& musicien)
-{
-	elements_[nElements_++] = musicien;
-}
-
-
-span<const shared_ptr<Musicien>> ListeMusiciens::getMusiciens() const
-{
-	return span<const shared_ptr<Musicien>>(elements_.get(), nElements_);
-}
 //TODO:fait Une fonction pour ajouter un Groupe à une ListeGroupes, le groupe existant déjà; on veut uniquement ajouter le pointeur vers le groupe existant.  Cette fonction doit doubler la taille du tableau alloué, avec au minimum un élément, dans le cas où la capacité est insuffisante pour ajouter l'élément.  Il faut alors allouer un nouveau tableau plus grand, copier ce qu'il y avait dans l'ancien, et éliminer l'ancien trop petit.  Cette fonction ne doit copier aucun Groupe ni Musicien, elle doit copier uniquement des pointeurs.
 void ListeGroupes::ajouter(Groupe* pointeurGroupe)
 {
@@ -177,19 +148,13 @@ void ListeGroupes::retirer(const Groupe* pointeurGroupe)
 shared_ptr<Musicien> ListeGroupes::trouverMusicien(const string& nom) const
 {
 	for (const Groupe* groupe : getGroupes()) {
-		for (const auto& musicien : groupe->membres.getMusiciens()) {
+		for (const auto& musicien : groupe->membres.getElements()) {
 			if (musicien->nom == nom) return musicien;
 		}
 	}
 	return nullptr;
 }
 
-shared_ptr<Musicien> ListeMusiciens::operator[](int index) const
-{
-	return{
-		elements_[index]
-	};
-}
 
 //TODO:fait Compléter les fonctions pour lire le fichier et créer/allouer une ListeGroupes.  La ListeGroupes devra être passée entre les fonctions, pour vérifier l'existence d'un Musicien avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
 shared_ptr<Musicien> lireMusicien(istream& fichier, const ListeGroupes& liste)
@@ -268,7 +233,7 @@ ostream& operator<< (ostream& o, const Groupe& groupe)
 {
 	o << groupe.nom << " (" << groupe.genre << ", " << groupe.anneeFormation << ")" << endl;
 
-	for (const auto& musicien : groupe.membres.getMusiciens()) {
+	for (const auto& musicien : groupe.membres.getElements()) {
 		afficherMusicien(o, *musicien);
 	}
 	return o;
@@ -329,11 +294,11 @@ int main()
 	Groupe* resultat = listeGroupes.trouverGroupe([](const Groupe* g) {return g->anneeFormation == 1985;});
 	cout << (*resultat);
 
-	Groupe* nirvahead = new Groupe(*listeGroupes.trouverGroupe([](const Groupe* g) { return g->nom == "Nirvana"; }));
-	listeGroupes.ajouter(nirvahead);
-	nirvahead->nom = "Nirvahead";
-	shared_ptr<Musicien> colinGreenwood = listeGroupes.trouverMusicien("Colin Greenwood");
-	nirvahead->membres[1] = colinGreenwood;
+	//Groupe* nirvahead = new Groupe(*listeGroupes.trouverGroupe([](const Groupe* g) { return g->nom == "Nirvana"; }));
+	//listeGroupes.ajouter(nirvahead);
+	//nirvahead->nom = "Nirvahead";
+	//shared_ptr<Musicien> colinGreenwood = listeGroupes.trouverMusicien("Colin Greenwood");
+	//nirvahead->membres[1] = colinGreenwood;
 	daveGrohl->anneeNaissance = 1969;
 	cout << ligneDeSeparation << "Les groupes sont maintenant:" << endl;
 	afficherListeGroupes(listeGroupes);
