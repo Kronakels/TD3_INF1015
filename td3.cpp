@@ -183,6 +183,14 @@ shared_ptr<Musicien> ListeGroupes::trouverMusicien(const string& nom) const
 	}
 	return nullptr;
 }
+
+std::shared_ptr<Musicien> ListeMusiciens::operator[](int index) const
+{
+	return{
+		elements_[index]
+	};
+}
+
 //TODO:fait Compléter les fonctions pour lire le fichier et créer/allouer une ListeGroupes.  La ListeGroupes devra être passée entre les fonctions, pour vérifier l'existence d'un Musicien avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
 shared_ptr<Musicien> lireMusicien(istream& fichier, const ListeGroupes& liste)
 {
@@ -324,6 +332,8 @@ int main()
 	Groupe* nirvahead = new Groupe(*listeGroupes.trouverGroupe([](const Groupe* g) { return g->nom == "Nirvana"; }));
 	listeGroupes.ajouter(nirvahead);
 	nirvahead->nom = "Nirvahead";
+	shared_ptr<Musicien> colinGreenwood = listeGroupes.trouverMusicien("Colin Greenwood");
+	nirvahead->membres[1] = colinGreenwood;
 
 
 	Groupe* nirvana = listeGroupes.getGroupes()[0];

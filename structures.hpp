@@ -34,6 +34,7 @@ public:
 	ListeMusiciens(const ListeMusiciens& autre);
 	void ajouter(const std::shared_ptr<Musicien>& musicien);
 	std::span<const std::shared_ptr<Musicien>> getMusiciens() const;
+	std::shared_ptr<Musicien> operator[](int index) const;
 private:
 	int capacite_, nElements_;
 	std::unique_ptr<std::shared_ptr<Musicien>[]> elements_;
