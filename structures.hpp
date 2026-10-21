@@ -39,6 +39,12 @@ public:
 		elements_[nElements_++] = element;
 	};
 
+	int getSize() const { return nElements_; }
+
+	std::shared_ptr<T>& operator[](int index) {
+		return elements_[index];
+	}
+
 	std::span<const std::shared_ptr<T>> getElements() const {
 		return span<const std::shared_ptr<T>>(elements_.get(), nElements_);
 	};
@@ -55,8 +61,13 @@ struct Musicien
 };
 using ListeMusiciens = Liste<Musicien>;
 
+
+
 struct Groupe
 {
+	Groupe(const Groupe*);
+	Groupe() = default;
+	Groupe(std::string nom, std::string genre, int anneeFormation, int nmembres);
 	std::string nom, genre; // Nom du groupe et genre de musique qu'il fait principalement.
 	int anneeFormation = 0; // Année où le groupe a été formé initialement.
 	ListeMusiciens membres;

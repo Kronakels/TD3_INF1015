@@ -3,7 +3,7 @@
 * à l'allocation dynamique et aux classes.
 * \file   td3.cpp
 * \author Anthony Gingras et Vincent Tran
-* \date   26 septembre 2026
+* \date   21 septembre 2026
 * Créé le 15 septembre 2026
 */
 
@@ -111,7 +111,22 @@ span<Groupe* const> ListeGroupes::getGroupes() const
 	return span<Groupe* const>(elements_, nElements_);
 }
 
+Groupe::Groupe(const Groupe* autre) :
+	nom(autre->nom),
+	genre(autre->genre),
+	anneeFormation(autre->anneeFormation),
+	membres(autre->membres.getSize())
+{
+	for (auto&& membre : autre->membres.getElements())
+		membres.ajouter(membre);
+}
 
+Groupe::Groupe(std::string nouveauNom, std::string nouveauGenre, int NouvelleAnneeFormation, int nmembres) :
+	nom(nouveauNom),
+	genre(nouveauGenre),
+	anneeFormation(NouvelleAnneeFormation),
+	membres(nmembres) {
+}
 //TODO:fait Une fonction pour ajouter un Groupe à une ListeGroupes, le groupe existant déjà; on veut uniquement ajouter le pointeur vers le groupe existant.  Cette fonction doit doubler la taille du tableau alloué, avec au minimum un élément, dans le cas où la capacité est insuffisante pour ajouter l'élément.  Il faut alors allouer un nouveau tableau plus grand, copier ce qu'il y avait dans l'ancien, et éliminer l'ancien trop petit.  Cette fonction ne doit copier aucun Groupe ni Musicien, elle doit copier uniquement des pointeurs.
 void ListeGroupes::ajouter(Groupe* pointeurGroupe)
 {
@@ -179,7 +194,7 @@ Groupe* lireGroupe(istream& fichier, const ListeGroupes& liste)
 	int anneeFormation = lireUintTailleVariable(fichier);
 	int nMembres = lireUintTailleVariable(fichier);
 
-	Groupe* groupe = new Groupe{ nom, genre, anneeFormation, ListeMusiciens(nMembres) };
+	Groupe* groupe = new Groupe{ nom, genre, anneeFormation, nMembres };
 
 	cout << groupe->nom << endl;
 
@@ -294,11 +309,11 @@ int main()
 	Groupe* resultat = listeGroupes.trouverGroupe([](const Groupe* g) {return g->anneeFormation == 1985;});
 	cout << (*resultat);
 
-	//Groupe* nirvahead = new Groupe(*listeGroupes.trouverGroupe([](const Groupe* g) { return g->nom == "Nirvana"; }));
-	//listeGroupes.ajouter(nirvahead);
-	//nirvahead->nom = "Nirvahead";
-	//shared_ptr<Musicien> colinGreenwood = listeGroupes.trouverMusicien("Colin Greenwood");
-	//nirvahead->membres[1] = colinGreenwood;
+	Groupe* nirvahead = new Groupe(listeGroupes.trouverGroupe([](const Groupe* g) { return g->nom == "Nirvana"; }));
+	listeGroupes.ajouter(nirvahead);
+	nirvahead->nom = "Nirvahead";
+	shared_ptr<Musicien> colinGreenwood = listeGroupes.trouverMusicien("Colin Greenwood");
+	nirvahead->membres[1] = colinGreenwood;
 	daveGrohl->anneeNaissance = 1969;
 	cout << ligneDeSeparation << "Les groupes sont maintenant:" << endl;
 	afficherListeGroupes(listeGroupes);
