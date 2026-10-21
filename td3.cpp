@@ -29,7 +29,6 @@
 using namespace std;
 using namespace iter;
 
-
 #pragma endregion//}
 
 #pragma region "Fonctions de base pour lire le fichier binaire"//{
@@ -112,6 +111,36 @@ span<Groupe* const> ListeGroupes::getGroupes() const
 	return span<Groupe* const>(elements_, nElements_);
 }
 
+ListeMusiciens::ListeMusiciens() :
+	capacite_(0), nElements_(0), elements_(nullptr)
+{
+}
+
+ListeMusiciens::ListeMusiciens(int capacite) :
+	capacite_(capacite), nElements_(0), elements_(make_unique<shared_ptr<Musicien>[]>(capacite))
+{
+}
+
+// Faire un deep copy des attributs de ListeMusiciens car on ne peut pas copier un unique_ptr
+ListeMusiciens::ListeMusiciens(const ListeMusiciens& autre) :
+	capacite_(autre.capacite_), 
+	nElements_(autre.nElements_),
+	elements_(make_unique<shared_ptr<Musicien>[]>(autre.capacite_))
+{
+	for (int i : range(nElements_))
+		elements_[i] = autre.elements_[i];
+}
+
+void ListeMusiciens::ajouter(const shared_ptr<Musicien>& musicien)
+{
+	elements_[nElements_++] = musicien;
+}
+
+
+span<const shared_ptr<Musicien>> ListeMusiciens::getMusiciens() const
+{
+	return span<const shared_ptr<Musicien>>(elements_.get(), nElements_);
+}
 //TODO:fait Une fonction pour ajouter un Groupe à une ListeGroupes, le groupe existant déjà; on veut uniquement ajouter le pointeur vers le groupe existant.  Cette fonction doit doubler la taille du tableau alloué, avec au minimum un élément, dans le cas où la capacité est insuffisante pour ajouter l'élément.  Il faut alors allouer un nouveau tableau plus grand, copier ce qu'il y avait dans l'ancien, et éliminer l'ancien trop petit.  Cette fonction ne doit copier aucun Groupe ni Musicien, elle doit copier uniquement des pointeurs.
 void ListeGroupes::ajouter(Groupe* pointeurGroupe)
 {
@@ -148,12 +177,20 @@ void ListeGroupes::retirer(const Groupe* pointeurGroupe)
 shared_ptr<Musicien> ListeGroupes::trouverMusicien(const string& nom) const
 {
 	for (const Groupe* groupe : getGroupes()) {
-		for (const auto& musicien : groupe->membres.getElements()) {
+		for (const auto& musicien : groupe->membres.getMusiciens()) {
 			if (musicien->nom == nom) return musicien;
 		}
 	}
 	return nullptr;
 }
+
+shared_ptr<Musicien> ListeMusiciens::operator[](int index) const
+{
+	return{
+		elements_[index]
+	};
+}
+
 //TODO:fait Compléter les fonctions pour lire le fichier et créer/allouer une ListeGroupes.  La ListeGroupes devra être passée entre les fonctions, pour vérifier l'existence d'un Musicien avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
 shared_ptr<Musicien> lireMusicien(istream& fichier, const ListeGroupes& liste)
 {
@@ -231,16 +268,13 @@ ostream& operator<< (ostream& o, const Groupe& groupe)
 {
 	o << groupe.nom << " (" << groupe.genre << ", " << groupe.anneeFormation << ")" << endl;
 
-	for (const auto& musicien : groupe.membres.getElements()) {
+	for (const auto& musicien : groupe.membres.getMusiciens()) {
 		afficherMusicien(o, *musicien);
 	}
 	return o;
 }
 
-void afficherGroupe(const Groupe& groupe)
-{
-	cout << groupe;
-}
+
 void afficherListeGroupes(const ListeGroupes& listeGroupes)
 {
 	//TODO: Utiliser des caractères Unicode pour définir la ligne de séparation (différente des autres lignes de séparations dans ce progamme).
@@ -250,7 +284,7 @@ void afficherListeGroupes(const ListeGroupes& listeGroupes)
 	span<Groupe* const> groupes = listeGroupes.getGroupes();
 	for (const Groupe* groupe : groupes) {
 		//TODO: Afficher le groupe.
-		afficherGroupe(*groupe);
+		cout << (*groupe);
 		cout << ligneDeSeparation;
 	}
 }
@@ -278,7 +312,7 @@ int main()
 	ListeGroupes listeGroupes = creerListe("groupes.bin");
 
 	cout << ligneDeSeparation << "Le premier groupe de la liste est:" << endl;
-	afficherGroupe(*listeGroupes.getGroupes()[0]);
+	cout << (*listeGroupes.getGroupes()[0]);
 	//TODO: Afficher le premier groupe de la liste.  Devrait être Nirvana.
 
 	cout << ligneDeSeparation << "Les groupes sont:" << endl;
@@ -286,29 +320,36 @@ int main()
 	//TODO: Afficher la liste des groupes.  Il devrait y en avoir 7.
 
 	shared_ptr<Musicien> daveGrohl = listeGroupes.trouverMusicien("Dave Grohl");
-	daveGrohl->anneeNaissance = 1969;
+	
 	//TODO: Modifier l'année de naissance de Dave Grohl pour être 1969 (a une valeur qui n'a pas de sens dans les données lues du fichier).  Vous ne pouvez pas supposer l'ordre des groupes et des membres dans les listes, il faut y aller par son nom.
 
 	//cout << ligneDeSeparation << "Liste des groupes où Dave Grohl joue sont:" << endl;
 	//afficherGroupesMusicien(listeGroupes, "Dave Grohl");
 	//TODO: Afficher la liste des groupe où Dave Grohl joue.  Il devrait y avoir Nirvana et Foo Fighters.
-
-	// test de trouverGroupe avec comme paramèrte l'année de formation 1985
 	Groupe* resultat = listeGroupes.trouverGroupe([](const Groupe* g) {return g->anneeFormation == 1985;});
-	afficherGroupe(*resultat);
-	
+	cout << (*resultat);
+
+	Groupe* nirvahead = new Groupe(*listeGroupes.trouverGroupe([](const Groupe* g) { return g->nom == "Nirvana"; }));
+	listeGroupes.ajouter(nirvahead);
+	nirvahead->nom = "Nirvahead";
+	shared_ptr<Musicien> colinGreenwood = listeGroupes.trouverMusicien("Colin Greenwood");
+	nirvahead->membres[1] = colinGreenwood;
+	daveGrohl->anneeNaissance = 1969;
+	cout << ligneDeSeparation << "Les groupes sont maintenant:" << endl;
+	afficherListeGroupes(listeGroupes);
+
+
 	Groupe* nirvana = listeGroupes.getGroupes()[0];
 	listeGroupes.retirer(nirvana);
 	detruireGroupe(nirvana);
 	//TODO: Détruire et enlever le premier groupe de la liste (Nirvana).  Ceci devrait "automatiquement" (par ce que font vos fonctions) détruire les membres Kurt Cobain et Krist Novoselic, mais pas Dave Grohl puisqu'il joue aussi dans Foo Fighters.
 
-	cout << ligneDeSeparation << "Les groupes sont maintenant:" << endl;
-	afficherListeGroupes(listeGroupes);
+	
 	//TODO: Afficher la liste des groupes.
 	//afficherGroupesMusicien(listeGroupes, "Elvis Gratton");
 	Groupe groupeInexistant = {}; //purement pour faire appel à chaque ligne
 	listeGroupes.retirer(&groupeInexistant);
-	
+
 
 	//TODO: Faire les appels qui manquent pour avoir 0% de lignes non exécutées dans le programme (aucune ligne rouge dans la couverture de code; c'est normal que les lignes de "new" et "delete" soient jaunes).  Vous avez aussi le droit d'effacer les lignes du programmes qui ne sont pas exécutée, si finalement vous pensez qu'elle ne sont pas utiles.
 	detruireListeGroupes(listeGroupes);
