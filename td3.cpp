@@ -184,7 +184,7 @@ shared_ptr<Musicien> ListeGroupes::trouverMusicien(const string& nom) const
 	return nullptr;
 }
 
-std::shared_ptr<Musicien> ListeMusiciens::operator[](int index) const
+shared_ptr<Musicien> ListeMusiciens::operator[](int index) const
 {
 	return{
 		elements_[index]
@@ -320,7 +320,7 @@ int main()
 	//TODO: Afficher la liste des groupes.  Il devrait y en avoir 7.
 
 	shared_ptr<Musicien> daveGrohl = listeGroupes.trouverMusicien("Dave Grohl");
-	daveGrohl->anneeNaissance = 1969;
+	
 	//TODO: Modifier l'année de naissance de Dave Grohl pour être 1969 (a une valeur qui n'a pas de sens dans les données lues du fichier).  Vous ne pouvez pas supposer l'ordre des groupes et des membres dans les listes, il faut y aller par son nom.
 
 	//cout << ligneDeSeparation << "Liste des groupes où Dave Grohl joue sont:" << endl;
@@ -334,6 +334,9 @@ int main()
 	nirvahead->nom = "Nirvahead";
 	shared_ptr<Musicien> colinGreenwood = listeGroupes.trouverMusicien("Colin Greenwood");
 	nirvahead->membres[1] = colinGreenwood;
+	daveGrohl->anneeNaissance = 1969;
+	cout << ligneDeSeparation << "Les groupes sont maintenant:" << endl;
+	afficherListeGroupes(listeGroupes);
 
 
 	Groupe* nirvana = listeGroupes.getGroupes()[0];
@@ -341,8 +344,7 @@ int main()
 	detruireGroupe(nirvana);
 	//TODO: Détruire et enlever le premier groupe de la liste (Nirvana).  Ceci devrait "automatiquement" (par ce que font vos fonctions) détruire les membres Kurt Cobain et Krist Novoselic, mais pas Dave Grohl puisqu'il joue aussi dans Foo Fighters.
 
-	cout << ligneDeSeparation << "Les groupes sont maintenant:" << endl;
-	afficherListeGroupes(listeGroupes);
+	
 	//TODO: Afficher la liste des groupes.
 	//afficherGroupesMusicien(listeGroupes, "Elvis Gratton");
 	Groupe groupeInexistant = {}; //purement pour faire appel à chaque ligne
