@@ -1,3 +1,11 @@
+/**
+* Structures de données pour une collection de groupes musicaux.
+* \file   structures.hpp
+* \author Anthony Gingras et Vincent Tran
+* \date   21 octobre 2026
+* Créé le 15 septembre 2026
+*/
+
 #pragma once
 // Structures mémoires pour une collection de groupes musicaux.
 
@@ -5,6 +13,8 @@
 #include <span>
 #include <memory>
 #include <functional>
+
+#include "cppitertools/range.hpp"
 
 struct Groupe; struct Musicien; // Permet d'utiliser les types alors qu'ils seront définis après.
 class ListeGroupes
@@ -29,25 +39,45 @@ template <typename T>
 class Liste
 {
 public:
-	Liste()	
-		:capacite_(0), nElements_(0), elements_(nullptr){};
+	Liste() :
+		capacite_(0), 
+		nElements_(0), 
+		elements_(nullptr)
+	{
+	}
 
 	explicit Liste(int capacite):
-		capacite_(capacite), nElements_(0), elements_(std::make_unique<std::shared_ptr<T>[]>(capacite)){};
+		capacite_(capacite),
+		nElements_(0),
+		elements_(std::make_unique<std::shared_ptr<T>[]>(capacite))
+	{
+	}
 
+	Liste(const Liste& autre) :
+		capacite_(autre.capacite_),
+		nElements_(autre.nElements_),
+		elements_(std::make_unique<std::shared_ptr<T>[]>(autre.capacite_))
+	{
+		for (int i : iter::range(nElements_))
+			elements_[i] = autre.elements_[i];
+	}
+	
 	void ajouter(const std::shared_ptr<T>& element) {
-		elements_[nElements_++] = element;
-	};
+		elements_[nElements_] = element;
+		nElements_++;
+	}
 
-	int getSize() const { return nElements_; }
+	int getTaille() const { return nElements_; }
 
-	std::shared_ptr<T>& operator[](int index) {
+	std::shared_ptr<T>& operator[](int index) 
+	{
 		return elements_[index];
 	}
 
-	std::span<const std::shared_ptr<T>> getElements() const {
+	std::span<const std::shared_ptr<T>> getElements() const 
+	{
 		return span<const std::shared_ptr<T>>(elements_.get(), nElements_);
-	};
+	}
 private:
 	int capacite_, nElements_;
 	std::unique_ptr<std::shared_ptr<T>[]> elements_;
@@ -67,7 +97,7 @@ struct Groupe
 {
 	Groupe(const Groupe*);
 	Groupe() = default;
-	Groupe(std::string nom, std::string genre, int anneeFormation, int nmembres);
+	Groupe(std::string nom, std::string genre, int anneeFormation, int nMembres);
 	std::string nom, genre; // Nom du groupe et genre de musique qu'il fait principalement.
 	int anneeFormation = 0; // Année où le groupe a été formé initialement.
 	ListeMusiciens membres;
