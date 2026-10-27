@@ -1,7 +1,7 @@
 ﻿/**
 * Programme qui permet de gérer des groupes de musiciens et des musiciens grâce
 * à l'allocation dynamique et aux classes.
-* \file   td3.cpp
+* \file   td4.cpp
 * \author Anthony Gingras et Vincent Tran
 * \date   21 octobre 2026
 * Créé le 15 septembre 2026

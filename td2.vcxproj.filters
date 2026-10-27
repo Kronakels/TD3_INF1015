@@ -21,7 +21,7 @@
     <ClCompile Include="bibliotheque_cours\verification_allocation.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="td3.cpp">
+    <ClCompile Include="td4.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>

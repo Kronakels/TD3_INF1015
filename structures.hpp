@@ -83,12 +83,31 @@ private:
 	std::unique_ptr<std::shared_ptr<T>[]> elements_;
 };
 
-struct Musicien
+class Musicien
 {
+public:
+	friend std::shared_ptr<Musicien> lireMusicien(std::istream& fichier, const ListeGroupes& liste);
+	friend std::shared_ptr<Musicien> ListeGroupes::trouverMusicien(const std::string& nom) const;
+	friend void afficherMusicien(std::ostream& o, const Musicien& musicien);
+	friend int main();
+private:
 	std::string nom, pays;
 	int anneeNaissance = 0;
 	//ListeGroupes joueDans;
 };
+
+class Instrumentiste : Musicien
+{
+private:
+	std::vector<std::string> instruments;
+};
+
+class Chanteur : Musicien
+{
+private:
+	std::string styleVocal;
+};
+
 using ListeMusiciens = Liste<Musicien>;
 
 

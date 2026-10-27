@@ -46,7 +46,7 @@
   <ItemGroup>
     <ClCompile Include="bibliotheque_cours\bibliotheque_cours.cpp" />
     <ClCompile Include="bibliotheque_cours\verification_allocation.cpp" />
-    <ClCompile Include="td3.cpp" />
+    <ClCompile Include="td4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\bibliotheque_cours.hpp" />
