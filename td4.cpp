@@ -184,7 +184,10 @@ shared_ptr<Musicien> lireMusicien(istream& fichier, const ListeGroupes& liste)
 		return musicienExistant;
 
 	cout << "Le musicien " << musicien.nom << " a été créé." << endl;
-	return shared_ptr<Musicien>(new Musicien(musicien)); 
+	ifstream typesMusiciensSimples("types_musiciens_simples.txt");
+	musicien = lireString(typesMusiciensSimples);
+	
+	return shared_ptr<Musicien>(new Musicien(musicien, "type_musiciens_simples.txt"));
 }
 
 Groupe* lireGroupe(istream& fichier, const ListeGroupes& liste)
