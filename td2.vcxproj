@@ -57,6 +57,10 @@
   <ItemGroup>
     <None Include=".gitignore" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\Downloads\TD4-A26-Fichiers\types_musiciens.txt" />
+    <Text Include="..\..\..\Downloads\TD4-A26-Fichiers\types_musiciens_simples.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
