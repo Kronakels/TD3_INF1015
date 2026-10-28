@@ -13,10 +13,12 @@
 #include <span>
 #include <memory>
 #include <functional>
+#include <vector>
+#include <istream>
 
 #include "cppitertools/range.hpp"
 
-struct Groupe; struct Musicien; // Permet d'utiliser les types alors qu'ils seront définis après.
+struct Groupe;  // Permet d'utiliser les types alors qu'ils seront définis après.
 class ListeGroupes
 {
 public:
@@ -93,19 +95,22 @@ public:
 private:
 	std::string nom, pays;
 	int anneeNaissance = 0;
-	//ListeGroupes joueDans;
 };
 
 class Instrumentiste : public Musicien
 {
+public:
+	Instrumentiste(const Musicien& musicien, std::istream& fichier);
 private:
-	std::vector<std::string> instruments;
+	std::vector<std::string> instruments_;
 };
 
 class Chanteur : public Musicien
 {
+public:
+	Chanteur(const Musicien& musicien, std::istream& fichier);
 private:
-	std::string styleVocal;
+	std::string styleVocal_;
 };
 
 using ListeMusiciens = Liste<Musicien>;

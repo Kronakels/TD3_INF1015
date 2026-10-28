@@ -251,7 +251,7 @@ void detruireListeGroupes(ListeGroupes& listeGroupes)
 
 void afficherMusicien(ostream& o, const Musicien& musicien)
 {
-	o << "  " << musicien.nom << ", " << musicien.pays << ", " << musicien.anneeNaissance << typeid(musicien).name() <<endl;
+	o << "  " << musicien.nom << ", " << musicien.pays << ", " << musicien.anneeNaissance << ", " << typeid(musicien).name() << endl;
 }
 //TODO: Une fonction pour afficher un groupe avec tous ses membres (en utilisant la fonction afficherMusicien ci-dessus).
 
@@ -277,16 +277,6 @@ void afficherListeGroupes(const ListeGroupes& listeGroupes)
 		cout << ligneDeSeparation;
 	}
 }
-
-//void afficherGroupesMusicien(const ListeGroupes& listeGroupes, const string& nomMusicien)
-//{
-	//TODO: Utiliser votre fonction pour trouver le musicien (au lieu de le mettre à nullptr).
-	//shared_ptr<Musicien> musicien = listeGroupes.trouverMusicien(nomMusicien);
-	//if (musicien == nullptr)
-		//cout << "Aucun musicien de ce nom" << endl;
-//	else
-	//	afficherListeGroupes(musicien->joueDans);
-//}
 
 int main()
 {
