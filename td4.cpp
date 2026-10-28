@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <span>
 #include <functional>
+#include <iomanip>
+#include <typeinfo>
 
 #include "cppitertools/range.hpp"
 
@@ -172,7 +174,7 @@ shared_ptr<Musicien> ListeGroupes::trouverMusicien(const string& nom) const
 
 
 //TODO:fait Compléter les fonctions pour lire le fichier et créer/allouer une ListeGroupes.  La ListeGroupes devra être passée entre les fonctions, pour vérifier l'existence d'un Musicien avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
-shared_ptr<Musicien> lireMusicien(istream& fichier, const ListeGroupes& liste)
+shared_ptr<Musicien> lireMusicien(istream& fichier, istream& fichierTypesMusiciensSimples , const ListeGroupes& liste)
 {
 	Musicien musicien = {};
 	musicien.nom = lireString(fichier);
@@ -184,13 +186,21 @@ shared_ptr<Musicien> lireMusicien(istream& fichier, const ListeGroupes& liste)
 		return musicienExistant;
 
 	cout << "Le musicien " << musicien.nom << " a été créé." << endl;
-	ifstream typesMusiciensSimples("types_musiciens_simples.txt");
-	musicien = lireString(typesMusiciensSimples);
-	
-	return shared_ptr<Musicien>(new Musicien(musicien, "type_musiciens_simples.txt"));
+
+	string typeMusicien = "";
+	string musicienNom = "";
+	fichierTypesMusiciensSimples >> quoted(musicienNom) >> typeMusicien;
+	if (musicienNom == musicien.nom){
+		if (typeMusicien == "chant"){
+			return make_shared<Chanteur>(musicien, fichierTypesMusiciensSimples);
+		}
+		else if (typeMusicien == "instrument") {
+			return make_shared<Instrumentiste>(musicien, fichierTypesMusiciensSimples);
+		}
+	}
 }
 
-Groupe* lireGroupe(istream& fichier, const ListeGroupes& liste)
+Groupe* lireGroupe(istream& fichier, istream& fichierTypesMusiciensSimples,const ListeGroupes& liste)
 {
 	string nom = lireString(fichier);
 	string genre = lireString(fichier);
@@ -202,14 +212,14 @@ Groupe* lireGroupe(istream& fichier, const ListeGroupes& liste)
 	cout << groupe->nom << endl;
 
 	for (int i : range(nMembres)) {
-		shared_ptr<Musicien> musicien = lireMusicien(fichier, liste);
+		shared_ptr<Musicien> musicien = lireMusicien(fichier, fichierTypesMusiciensSimples,liste);
 		groupe->membres.ajouter(musicien);
 	}
 
 	return groupe; 
 }
 
-ListeGroupes creerListe(string nomFichier)
+ListeGroupes creerListe(string nomFichier, istream& fichierTypesMusiciensSimples)
 {
 	ifstream fichier(nomFichier, ios::binary);
 	fichier.exceptions(ios::failbit);
@@ -219,7 +229,7 @@ ListeGroupes creerListe(string nomFichier)
 	ListeGroupes listeGroupes(nElements);
 
 	for (int i : range(nElements)) {
-		listeGroupes.ajouter(lireGroupe(fichier, listeGroupes));
+		listeGroupes.ajouter(lireGroupe(fichier, fichierTypesMusiciensSimples, listeGroupes));
 	}
 	return listeGroupes; 
 }
@@ -241,7 +251,7 @@ void detruireListeGroupes(ListeGroupes& listeGroupes)
 
 void afficherMusicien(ostream& o, const Musicien& musicien)
 {
-	o << "  " << musicien.nom << ", " << musicien.pays << ", " << musicien.anneeNaissance << endl;
+	o << "  " << musicien.nom << ", " << musicien.pays << ", " << musicien.anneeNaissance << typeid(musicien).name() <<endl;
 }
 //TODO: Une fonction pour afficher un groupe avec tous ses membres (en utilisant la fonction afficherMusicien ci-dessus).
 
@@ -287,7 +297,9 @@ int main()
 	static const int anneeFormationRadiohead = 1985;
 	static const int anneeNaissanceDaveGrohl = 1969;
 
-	ListeGroupes listeGroupes = creerListe("groupes.bin");
+	ifstream fichierTypesMusicienSimples("types_musiciens_simples.txt");
+
+	ListeGroupes listeGroupes = creerListe("groupes.bin", fichierTypesMusicienSimples);
 
 	cout << ligneDeSeparation << "Le premier groupe de la liste est:" << endl;
 	cout << (*listeGroupes.getGroupes()[0]);

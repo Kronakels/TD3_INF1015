@@ -76,7 +76,7 @@ public:
 
 	std::span<const std::shared_ptr<T>> getElements() const 
 	{
-		return span<const std::shared_ptr<T>>(elements_.get(), nElements_);
+		return std::span<const std::shared_ptr<T>>(elements_.get(), nElements_);
 	}
 private:
 	int capacite_, nElements_;
@@ -86,7 +86,7 @@ private:
 class Musicien
 {
 public:
-	friend std::shared_ptr<Musicien> lireMusicien(std::istream& fichier, const ListeGroupes& liste);
+	friend std::shared_ptr<Musicien> lireMusicien(std::istream& fichier, std::istream& fichierTypes, const ListeGroupes& liste);
 	friend std::shared_ptr<Musicien> ListeGroupes::trouverMusicien(const std::string& nom) const;
 	friend void afficherMusicien(std::ostream& o, const Musicien& musicien);
 	friend int main();
@@ -96,13 +96,13 @@ private:
 	//ListeGroupes joueDans;
 };
 
-class Instrumentiste : Musicien
+class Instrumentiste : public Musicien
 {
 private:
 	std::vector<std::string> instruments;
 };
 
-class Chanteur : Musicien
+class Chanteur : public Musicien
 {
 private:
 	std::string styleVocal;
