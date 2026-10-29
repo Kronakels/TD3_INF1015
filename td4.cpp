@@ -170,6 +170,14 @@ shared_ptr<Musicien> ListeGroupes::trouverMusicien(const string& nom) const
 	return nullptr;
 }
 
+std::ostream& operator<<(std::ostream& os, const Affichable& obj) {
+	return obj.afficher(os);
+};
+
+std::ostream& Musicien::afficher(std::ostream& os) const {
+	os << "  " << nom << ", " << pays << ", " << anneeNaissance << endl;
+	return os;
+};
 
 //TODO:fait Compléter les fonctions pour lire le fichier et créer/allouer une ListeGroupes.  La ListeGroupes devra être passée entre les fonctions, pour vérifier l'existence d'un Musicien avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
 shared_ptr<Musicien> lireMusicien(istream& fichier, const ListeGroupes& liste)
@@ -236,10 +244,6 @@ void detruireListeGroupes(ListeGroupes& listeGroupes)
 	listeGroupes.libererMemoire();
 }
 
-void afficherMusicien(ostream& o, const Musicien& musicien)
-{
-	o << "  " << musicien.nom << ", " << musicien.pays << ", " << musicien.anneeNaissance << endl;
-}
 //TODO: Une fonction pour afficher un groupe avec tous ses membres (en utilisant la fonction afficherMusicien ci-dessus).
 
 
@@ -248,7 +252,7 @@ ostream& operator<< (ostream& o, const Groupe& groupe)
 	o << groupe.nom << " (" << groupe.genre << ", " << groupe.anneeFormation << ")" << endl;
 
 	for (const auto& musicien : groupe.membres.getElements()) {
-		afficherMusicien(o, *musicien);
+		cout << *musicien;
 	}
 	return o;
 }
@@ -306,6 +310,7 @@ int main()
 
 	shared_ptr<Musicien> daveGrohl = listeGroupes.trouverMusicien("Dave Grohl");
 	daveGrohl->anneeNaissance = anneeNaissanceDaveGrohl;
+	cout << *daveGrohl << endl;
 
 	cout << ligneDeSeparation << "Les groupes sont maintenant:" << endl;
 	afficherListeGroupes(listeGroupes);

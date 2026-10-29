@@ -83,12 +83,21 @@ private:
 	std::unique_ptr<std::shared_ptr<T>[]> elements_;
 };
 
-class Musicien
+class Affichable 
+{
+public:
+	virtual ~Affichable() = default;
+	virtual std::ostream& afficher(std::ostream& os) const = 0;
+	friend std::ostream& operator<<(std::ostream& os, const Affichable& obj);
+};
+
+class Musicien: public Affichable
 {
 public:
 	friend std::shared_ptr<Musicien> lireMusicien(std::istream& fichier, const ListeGroupes& liste);
 	friend std::shared_ptr<Musicien> ListeGroupes::trouverMusicien(const std::string& nom) const;
 	friend void afficherMusicien(std::ostream& o, const Musicien& musicien);
+	std::ostream& afficher(std::ostream& os) const override;
 	friend int main();
 private:
 	std::string nom, pays;
@@ -96,17 +105,18 @@ private:
 	//ListeGroupes joueDans;
 };
 
-class Instrumentiste : Musicien
+class Instrumentiste : public Musicien
 {
 private:
 	std::vector<std::string> instruments;
 };
 
-class Chanteur : Musicien
+class Chanteur :public Musicien
 {
 private:
 	std::string styleVocal;
 };
+
 
 using ListeMusiciens = Liste<Musicien>;
 
