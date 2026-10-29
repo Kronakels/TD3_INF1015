@@ -18,7 +18,7 @@
 
 #include "cppitertools/range.hpp"
 
-struct Groupe;  // Permet d'utiliser les types alors qu'ils seront définis après.
+struct Groupe; class Musicien;   // Permet d'utiliser les types alors qu'ils seront définis après.
 class ListeGroupes
 {
 public:

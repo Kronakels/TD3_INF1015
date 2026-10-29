@@ -43,10 +43,10 @@
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\Downloads\TD4-A26-Fichiers\types_musiciens.txt">
+    <Text Include="types_musiciens.txt">
       <Filter>Fichiers de ressources</Filter>
     </Text>
-    <Text Include="..\..\..\Downloads\TD4-A26-Fichiers\types_musiciens_simples.txt">
+    <Text Include="types_musiciens_simples.txt">
       <Filter>Fichiers de ressources</Filter>
     </Text>
   </ItemGroup>

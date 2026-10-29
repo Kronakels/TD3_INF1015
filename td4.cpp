@@ -171,7 +171,22 @@ shared_ptr<Musicien> ListeGroupes::trouverMusicien(const string& nom) const
 	}
 	return nullptr;
 }
-
+Instrumentiste::Instrumentiste(const Musicien& musicien, std::istream& fichier) :
+	Musicien(musicien)
+{
+	int nInstruments = 0;
+	fichier >> nInstruments;
+	for (int i : range(nInstruments)) {
+		string nouvelInstrument = "";
+		fichier >> quoted(nouvelInstrument);
+		instruments_.push_back(nouvelInstrument);
+	}
+}
+Chanteur::Chanteur(const Musicien& musicien, std::istream& fichier) :
+	Musicien(musicien)
+{
+	fichier >> quoted(styleVocal_);
+}
 
 //TODO:fait Compléter les fonctions pour lire le fichier et créer/allouer une ListeGroupes.  La ListeGroupes devra être passée entre les fonctions, pour vérifier l'existence d'un Musicien avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
 shared_ptr<Musicien> lireMusicien(istream& fichier, istream& fichierTypesMusiciensSimples , const ListeGroupes& liste)
