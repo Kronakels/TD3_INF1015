@@ -42,4 +42,12 @@
   <ItemGroup>
     <None Include=".gitignore" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="types_musiciens.txt">
+      <Filter>Fichiers de ressources</Filter>
+    </Text>
+    <Text Include="types_musiciens_simples.txt">
+      <Filter>Fichiers de ressources</Filter>
+    </Text>
+  </ItemGroup>
 </Project>
