@@ -108,7 +108,7 @@ private:
 	int anneeNaissance = 0;
 };
 
-class Instrumentiste : public public Musicien
+class Instrumentiste : public Musicien
 {
 public:
 	Instrumentiste(const Musicien &musicien, std::istream &fichier);
@@ -117,7 +117,7 @@ private:
 	std::vector<std::string> instruments_;
 };
 
-class Chanteur : public public Musicien
+class Chanteur : public Musicien
 {
 public:
 	Chanteur(const Musicien &musicien, std::istream &fichier);
