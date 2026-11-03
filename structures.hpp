@@ -97,6 +97,7 @@ public:
 class Musicien : public Affichable
 {
 public:
+	~Musicien() override;
 	friend std::shared_ptr<Musicien> lireMusicien(std::istream &fichier, std::istream &fichierTypes, const ListeGroupes &liste);
 	friend std::shared_ptr<Musicien> ListeGroupes::trouverMusicien(const std::string &nom) const;
 	friend void afficherMusicien(std::ostream &o, const Musicien &musicien);
@@ -111,6 +112,7 @@ private:
 class Instrumentiste : public Musicien
 {
 public:
+	~Instrumentiste() override;
 	Instrumentiste(const Musicien &musicien, std::istream &fichier);
 
 private:
@@ -120,6 +122,7 @@ private:
 class Chanteur : public Musicien
 {
 public:
+	~Chanteur() override;
 	Chanteur(const Musicien &musicien, std::istream &fichier);
 
 private:

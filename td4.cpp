@@ -202,6 +202,26 @@ std::ostream &Musicien::afficher(std::ostream &os) const
 	return os;
 };
 
+Musicien::~Musicien()
+{
+	cout << "Destruction du musicien : " << nom << endl;
+}
+
+Chanteur::~Chanteur()
+{
+	cout << "Destruction du chanteur." << endl;
+}
+
+Instrumentiste::~Instrumentiste()
+{
+	cout << "Destruction de l'instrumentiste." << endl;
+}
+
+//ChanteurInstrumentiste::~ChanteurInstrumentiste()
+//{
+//	cout << "Destruction du chanteur-instrumentiste." << endl;
+//}
+
 // TODO:fait Compléter les fonctions pour lire le fichier et créer/allouer une ListeGroupes.  La ListeGroupes devra être passée entre les fonctions, pour vérifier l'existence d'un Musicien avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
 shared_ptr<Musicien> lireMusicien(istream &fichier, istream &fichierTypesMusiciensSimples, const ListeGroupes &liste)
 {
@@ -308,6 +328,26 @@ void afficherListeGroupes(const ListeGroupes &listeGroupes)
 	}
 }
 
+void verifierDestruction(const ListeGroupes& listeGroupes)
+{
+	cout << "\n--- Test de destruction ---" << endl;
+	Groupe* premierGroupe = listeGroupes.getGroupes()[0];
+	shared_ptr<Musicien> premierMusicien = premierGroupe->membres[0];
+
+	unique_ptr<Musicien> copieMusicien;
+
+	if (auto* musicien = dynamic_cast<Chanteur*>(premierMusicien.get()))
+	{
+		copieMusicien = make_unique<Chanteur>(*musicien);
+	}
+	else
+	{
+		copieMusicien = make_unique<Musicien>(*premierMusicien);
+	}
+	cout << "Fin du test de destruction." << endl;
+
+}
+
 int main()
 {
 	bibliotheque_cours::activerCouleursAnsi(); // Permet sous Windows les "ANSI escape code" pour changer de couleurs https://en.wikipedia.org/wiki/ANSI_escape_code ; les consoles Linux/Mac les supportent normalement par défaut.
@@ -345,6 +385,8 @@ int main()
 
 	cout << ligneDeSeparation << "Les groupes sont maintenant:" << endl;
 	afficherListeGroupes(listeGroupes);
+
+	verifierDestruction(listeGroupes);
 
 	Groupe *nirvana = listeGroupes.getGroupes()[0];
 	listeGroupes.retirer(nirvana);
