@@ -114,7 +114,7 @@ class Instrumentiste : public Musicien
 public:
 	~Instrumentiste() override;
 	Instrumentiste(const Musicien &musicien, std::istream &fichier);
-
+	std::ostream &afficher(std::ostream& os) const override;
 private:
 	std::vector<std::string> instruments_;
 };
@@ -124,7 +124,7 @@ class Chanteur : public Musicien
 public:
 	~Chanteur() override;
 	Chanteur(const Musicien &musicien, std::istream &fichier);
-
+	std::ostream &afficher(std::ostream& os) const override;
 private:
 	std::string styleVocal_;
 };

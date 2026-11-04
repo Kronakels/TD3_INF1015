@@ -202,6 +202,24 @@ std::ostream &Musicien::afficher(std::ostream &os) const
 	return os;
 };
 
+std::ostream &Instrumentiste::afficher(std::ostream& os) const
+{
+	Musicien::afficher(os);
+	os << "Instruments: ";
+	for (auto&& instrument : instruments_) {
+		os <<" " << instrument;
+	}
+	os << endl;
+	return os;
+};
+
+std::ostream &Chanteur::afficher(std::ostream& os) const
+{
+	Musicien::afficher(os);
+	os << "style vocal: " << styleVocal_ << endl;
+	return os;
+};
+
 Musicien::~Musicien()
 {
 	cout << "Destruction du musicien : " << nom << endl;
