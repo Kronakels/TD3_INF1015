@@ -183,12 +183,20 @@ Instrumentiste::Instrumentiste(const Musicien &musicien, std::istream &fichier) 
 	{
 		string nouvelInstrument = "";
 		fichier >> quoted(nouvelInstrument);
-		instruments_.push_back(nouvelInstrument);
+		instruments.push_back(nouvelInstrument);
 	}
 }
 Chanteur::Chanteur(const Musicien &musicien, std::istream &fichier) : Musicien(musicien)
 {
-	fichier >> quoted(styleVocal_);
+	fichier >> quoted(styleVocal);
+}
+
+
+ChanteurInstrumentiste::ChanteurInstrumentiste(const Musicien &musicien, std::istream &fichier) : 
+	Musicien(musicien),
+	Chanteur(musicien, fichier),
+	Instrumentiste(musicien, fichier)
+{
 }
 
 std::ostream &operator<<(std::ostream &os, const Affichable &obj)
@@ -241,7 +249,7 @@ Instrumentiste::~Instrumentiste()
 //}
 
 // TODO:fait Compléter les fonctions pour lire le fichier et créer/allouer une ListeGroupes.  La ListeGroupes devra être passée entre les fonctions, pour vérifier l'existence d'un Musicien avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
-shared_ptr<Musicien> lireMusicien(istream &fichier, istream &fichierTypesMusiciensSimples, const ListeGroupes &liste)
+shared_ptr<Musicien> lireMusicien(istream &fichier, istream &fichierTypesMusiciens, const ListeGroupes &liste)
 {
 	Musicien musicien = {};
 	musicien.nom = lireString(fichier);
@@ -256,16 +264,20 @@ shared_ptr<Musicien> lireMusicien(istream &fichier, istream &fichierTypesMusicie
 
 	string typeMusicien = "";
 	string musicienNom = "";
-	fichierTypesMusiciensSimples >> quoted(musicienNom) >> typeMusicien;
+	fichierTypesMusiciens >> quoted(musicienNom) >> typeMusicien;
 	if (musicienNom == musicien.nom)
 	{
 		if (typeMusicien == "chant")
 		{
-			return make_shared<Chanteur>(musicien, fichierTypesMusiciensSimples);
+			return make_shared<Chanteur>(musicien, fichierTypesMusiciens);
 		}
 		else if (typeMusicien == "instrument")
 		{
-			return make_shared<Instrumentiste>(musicien, fichierTypesMusiciensSimples);
+			return make_shared<Instrumentiste>(musicien, fichierTypesMusiciens);
+		}
+		else if (typeMusicien == "chant+instrument")
+		{
+			return make_shared<ChanteurInstrumentiste>(musicien, fichierTypesMusiciens);
 		}
 	}
 }
@@ -374,7 +386,7 @@ int main()
 	static const int anneeFormationRadiohead = 1985;
 	static const int anneeNaissanceDaveGrohl = 1969;
 
-	ifstream fichierTypesMusicienSimples("types_musiciens_simples.txt");
+	ifstream fichierTypesMusicienSimples("types_musiciens.txt");
 
 	ListeGroupes listeGroupes = creerListe("groupes.bin", fichierTypesMusicienSimples);
 

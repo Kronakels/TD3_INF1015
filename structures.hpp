@@ -109,24 +109,32 @@ private:
 	int anneeNaissance = 0;
 };
 
-class Instrumentiste : public Musicien
+class Instrumentiste : virtual public Musicien
 {
 public:
 	~Instrumentiste() override;
 	Instrumentiste(const Musicien &musicien, std::istream &fichier);
-	std::ostream &afficher(std::ostream& os) const override;
+	std::ostream &afficher(std::ostream &os) const override;
+
 private:
 	std::vector<std::string> instruments_;
 };
 
-class Chanteur : public Musicien
+class Chanteur : virtual public Musicien
 {
 public:
 	~Chanteur() override;
 	Chanteur(const Musicien &musicien, std::istream &fichier);
-	std::ostream &afficher(std::ostream& os) const override;
-private:
-	std::string styleVocal_;
+	std::ostream &afficher(std::ostream &os) const override;
+
+protected:
+	std::string styleVocal;
+};
+
+class ChanteurInstrumentiste : public Chanteur, public Instrumentiste
+{
+public:
+	ChanteurInstrumentiste(const Musicien &musicien, std::istream &fichier);
 };
 
 using ListeMusiciens = Liste<Musicien>;
