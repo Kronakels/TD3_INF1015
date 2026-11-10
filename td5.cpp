@@ -21,6 +21,7 @@
 #include <functional>
 #include <iomanip>
 #include <typeinfo>
+#include <forward_list>
 
 #include "cppitertools/range.hpp"
 
@@ -418,7 +419,7 @@ void verifierDestruction(const ListeGroupes& listeGroupes)
 
 }
 
-vector<shared_ptr<Musicien>> copierTousMusiciens(const ListeGroupes& listeGroupes)
+vector<shared_ptr<Musicien>> copierTousMusiciensVecteur(const ListeGroupes& listeGroupes)
 {
 	vector<shared_ptr<Musicien>> musiciens;
 	for (const Groupe* groupe : listeGroupes.getGroupes())
@@ -427,6 +428,27 @@ vector<shared_ptr<Musicien>> copierTousMusiciens(const ListeGroupes& listeGroupe
 			musiciens.push_back(musicien);
 	}
 	return musiciens;
+}
+
+forward_list<shared_ptr<Musicien>> copierEnListeLiee(const vector<shared_ptr<Musicien>>& musiciens)
+{
+	forward_list<shared_ptr<Musicien>> forwardListeMusicien;
+	auto position = forwardListeMusicien.before_begin();
+	for (const shared_ptr<Musicien>& musicien : musiciens)
+	{
+		position = forwardListeMusicien.insert_after(position, musicien);
+	}
+	return forwardListeMusicien;
+}
+
+forward_list<shared_ptr<Musicien>> copierEnListeLieeEnvers(const forward_list<shared_ptr<Musicien>>& source)
+{
+	forward_list<shared_ptr<Musicien>> resultat;
+	for (const shared_ptr<Musicien> musicien : source)
+	{
+		resultat.push_front(musicien);
+	}
+	return resultat;
 }
 
 template <typename V>
@@ -447,7 +469,14 @@ int main()
 	ifstream fichierTypesMusiciens("types_musiciens.txt");
 
 	ListeGroupes listeGroupes = creerListe("groupes.bin", fichierTypesMusiciens);
-	vector<shared_ptr<Musicien>> vecteurMusiciens = copierTousMusiciens(listeGroupes);
+	vector<shared_ptr<Musicien>> vecteurMusiciens = copierTousMusiciensVecteur(listeGroupes);
+	forward_list<shared_ptr<Musicien>> forwardListeMusicien = copierEnListeLiee(vecteurMusiciens);
+	forward_list<shared_ptr<Musicien>> forwardListeMusicienEnvers = copierEnListeLieeEnvers(forwardListeMusicien);
+	cout << "affichage vecteur musiciens: " << endl;
 	affichage(vecteurMusiciens);
+	cout << "affichage forward_list musiciens: " << endl;
+	affichage(forwardListeMusicien);
+	cout << "affichage à de l'envers de forward_list musiciens: " << endl;
+	affichage(forwardListeMusicienEnvers);
 	detruireListeGroupes(listeGroupes);
 }
