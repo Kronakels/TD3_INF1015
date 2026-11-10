@@ -21,7 +21,7 @@
 #include <functional>
 #include <iomanip>
 #include <typeinfo>
-
+#include <forward_list>
 #include "cppitertools/range.hpp"
 
 #include "bibliotheque_cours.hpp"
@@ -284,7 +284,7 @@ ChanteurInstrumentiste::~ChanteurInstrumentiste()
 	cout << "Destruction du chanteur-instrumentiste." << endl;
 }
 
-// TODO:fait Compléter les fonctions pour lire le fichier et créer/allouer une ListeGroupes.  La ListeGroupes devra être passée entre les fonctions, pour vérifier l'existence d'un Musicien avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
+
 shared_ptr<Musicien> lireMusicien(istream& fichier, istream& fichierTypesMusiciens, const ListeGroupes& liste)
 {
 	Musicien musicien = {};
@@ -298,6 +298,7 @@ shared_ptr<Musicien> lireMusicien(istream& fichier, istream& fichierTypesMusicie
 
 	cout << "Le musicien " << musicien.nom_ << " a été créé." << endl;
 
+
 	string typeMusicien = "";
 	string musicienNom = "";
 	fichierTypesMusiciens >> quoted(musicienNom) >> typeMusicien;
@@ -305,20 +306,32 @@ shared_ptr<Musicien> lireMusicien(istream& fichier, istream& fichierTypesMusicie
 	{
 		if (typeMusicien == "chant")
 		{
+			musicien.vectorTousMusiciens_.push_back(make_shared<Chanteur>(musicien, fichierTypesMusiciens));
 			return make_shared<Chanteur>(musicien, fichierTypesMusiciens);
 		}
 		else if (typeMusicien == "instrument")
 		{
+			musicien.vectorTousMusiciens_.push_back(make_shared<Instrumentiste>(musicien, fichierTypesMusiciens));
 			return make_shared<Instrumentiste>(musicien, fichierTypesMusiciens);
 		}
 		else if (typeMusicien == "chant+instrument")
 		{
+			musicien.vectorTousMusiciens_.push_back(make_shared<ChanteurInstrumentiste>(musicien, fichierTypesMusiciens));
 			return make_shared<ChanteurInstrumentiste>(musicien, fichierTypesMusiciens);
 		}
 	}
 	erreurFataleAssert("Type de musicien inconnu ou nom inattendu dans le fichier de types.");
+
+	musicien.afficherVectorTousMusiciens(musicien.vectorTousMusiciens_);
 }
 
+template <typename U>
+void Musicien::afficherVectorTousMusiciens(U vectorTousMusiciens)
+{
+	for (auto musicien: vectorTousMusiciens) {
+		cout << musicien;
+	}
+}
 Groupe* lireGroupe(istream& fichier, istream& fichierTypesMusiciens, const ListeGroupes& liste)
 {
 	string nom = lireString(fichier);
@@ -423,67 +436,13 @@ int main()
 	bibliotheque_cours::activerCouleursAnsi(); // Permet sous Windows les "ANSI escape code" pour changer de couleurs https://en.wikipedia.org/wiki/ANSI_escape_code ; les consoles Linux/Mac les supportent normalement par défaut.
 
 	static const string ligneDeSeparation = "\n\033[35m════════════════════════════════════════\033[0m\n";
-	static const int anneeFormationRadiohead = 1985;
-	static const int anneeNaissanceDaveGrohl = 1969;
+	
 
 	ifstream fichierTypesMusiciens("types_musiciens.txt");
 
 	ListeGroupes listeGroupes = creerListe("groupes.bin", fichierTypesMusiciens);
 
-	cout << ligneDeSeparation << "Le premier groupe de la liste est:" << endl;
-	cout << (*listeGroupes.getGroupes()[0]);
 
-	cout << ligneDeSeparation << "Les groupes sont:" << endl;
-	afficherListeGroupes(listeGroupes);
 
-	// cout << ligneDeSeparation << "Liste des groupes où Dave Grohl joue sont:" << endl;
-	// afficherGroupesMusicien(listeGroupes, "Dave Grohl");
-	Groupe* resultat = listeGroupes.trouverGroupe([](const Groupe* g)
-		{ return g->anneeFormation == anneeFormationRadiohead; });
-	cout << (*resultat);
-
-	Groupe* nirvahead = new Groupe(listeGroupes.trouverGroupe([](const Groupe* g)
-		{ return g->nom == "Nirvana"; }));
-	listeGroupes.ajouter(nirvahead);
-	nirvahead->nom = "Nirvahead";
-	shared_ptr<Musicien> colinGreenwood = listeGroupes.trouverMusicien("Colin Greenwood");
-	nirvahead->membres[1] = colinGreenwood;
-
-	shared_ptr<Musicien> daveGrohl = listeGroupes.trouverMusicien("Dave Grohl");
-	daveGrohl->anneeNaissance_ = anneeNaissanceDaveGrohl;
-	cout << *daveGrohl << endl;
-
-	cout << ligneDeSeparation << "Les groupes sont maintenant:" << endl;
-	afficherListeGroupes(listeGroupes);
-
-	verifierDestruction(listeGroupes);
-
-	Groupe* nirvana = listeGroupes.getGroupes()[0];
-	listeGroupes.retirer(nirvana);
-	detruireGroupe(nirvana);
-
-	Groupe groupeInexistant;
-	listeGroupes.retirer(&groupeInexistant);
-
-	static const int nEntiers = 2;
-	static const int premierEntier = 10;
-	static const int deuxiemeEntier = 20;
-	static const int entierRemplace = 30;
-	static const int entierModifie = 40;
-
-	Liste<int> listeInts(nEntiers);
-	listeInts.ajouter(make_shared<int>(premierEntier));
-	listeInts.ajouter(make_shared<int>(deuxiemeEntier));
-
-	Liste listeInts2 = listeInts;
-
-	listeInts[0] = make_shared<int>(entierRemplace);
-	*listeInts[1] = entierModifie;
-
-	for (const Liste<int>* liste : { &listeInts, &listeInts2 })
-	{
-		for (const shared_ptr<int>& entier : liste->getElements())
-			cout << *entier << endl;
-	}
 	detruireListeGroupes(listeGroupes);
 }
