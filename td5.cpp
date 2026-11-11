@@ -511,6 +511,8 @@ int main()
 	cout << "affichage de la copie du sens identique de la forward_list de musiciens: " << endl;
 	affichage(forwardListeMusicienCopie);
 	cout << "affichage de la copie sous forme de vecteur dans l'ordre inverse: " << endl;
+	cout << "itération sur Nirvana: " << endl;
+	for (auto&& musicien: listeGroupes.getGroupes().first())
 	affichage(vecteurMusiciensCopieEnvers);
 	detruireListeGroupes(listeGroupes);
 }

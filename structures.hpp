@@ -43,6 +43,37 @@ template <typename T>
 class Liste
 {
 public:
+	class Iterateur
+	{
+	public:
+		Iterateur(std::shared_ptr<T>* pointeur) : pointeur_(pointeur)
+		{
+		}
+
+		Iterateur& operator++()
+		{
+			pointeur_++;
+			return *this;
+		}
+
+		std::shared_ptr<T> operator*() const
+		{
+			return *pointeur_;
+		}
+
+		bool operator!=(const Iterateur& autre)const
+		{
+			return pointeur_ != autre.pointeur_;
+		}
+
+		bool operator==(const Iterateur& autre) const
+		{
+			return pointeur_ == autre.pointeur_;
+		}
+	private:
+		std::shared_ptr<T>* pointeur_;
+	};
+
 	Liste() : capacite_(0),
 		nElements_(0),
 		elements_(nullptr)
