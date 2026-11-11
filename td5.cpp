@@ -424,7 +424,7 @@ void verifierDestruction(const ListeGroupes& listeGroupes)
 template <typename Conteneur>
 void afficherMusiciens(const string& titre, const Conteneur& conteneur)
 {
-	cout <<titre << endl;
+	cout << "---------- " << titre << " ----------" << endl;
 	for (const auto& musicien : conteneur)
 	{
 		if (musicien != nullptr)
@@ -455,6 +455,28 @@ int main()
 	// 0.3 
 	afficherMusiciens("Partie du TD: 0.3", tousLesMusiciens);
 
+	// 1.1
+	forward_list<shared_ptr<Musicien>> listeMusiciens;
+	for (auto it = tousLesMusiciens.rbegin(); it != tousLesMusiciens.rend(); ++it) {
+		listeMusiciens.push_front(*it);
+	}
+	afficherMusiciens("Partie du TD: 1.1", listeMusiciens);
+
+	// 1.2
+	forward_list<shared_ptr<Musicien>> listeMusiciensInverse;
+	for (const auto& musicien : listeMusiciens) {
+		listeMusiciensInverse.push_front(musicien);
+	}
+	afficherMusiciens("Partie du TD: 1.2", listeMusiciensInverse);
+
+	// 1.3
+	forward_list<shared_ptr<Musicien>> listeMusiciensCopie;
+	auto it = listeMusiciensCopie.before_begin(); 
+
+	for (const auto& musicien : listeMusiciens) {
+		it = listeMusiciensCopie.insert_after(it, musicien);
+	}
+	afficherMusiciens("Partie du TD: 1.3", listeMusiciensCopie);
 
 	detruireListeGroupes(listeGroupes);
 }
