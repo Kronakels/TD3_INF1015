@@ -102,15 +102,11 @@ public:
 	friend std::shared_ptr<Musicien> lireMusicien(std::istream& fichier, std::istream& fichierTypes, const ListeGroupes& liste);
 	friend std::shared_ptr<Musicien> ListeGroupes::trouverMusicien(const std::string& nom) const;
 	std::ostream& afficher(std::ostream& os) const override;
-
-	template <typename U>
-	void afficherVectorTousMusiciens(U vectorMusiciens);
 	friend int main();
 
 private:
 	std::string nom_, pays_;
 	int anneeNaissance_ = 0;
-	std::vector<std::shared_ptr<Musicien>> vectorTousMusiciens_;
 };
 
 class Instrumentiste : virtual public Musicien

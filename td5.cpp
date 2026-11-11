@@ -306,32 +306,21 @@ shared_ptr<Musicien> lireMusicien(istream& fichier, istream& fichierTypesMusicie
 	{
 		if (typeMusicien == "chant")
 		{
-			musicien.vectorTousMusiciens_.push_back(make_shared<Chanteur>(musicien, fichierTypesMusiciens));
 			return make_shared<Chanteur>(musicien, fichierTypesMusiciens);
 		}
 		else if (typeMusicien == "instrument")
 		{
-			musicien.vectorTousMusiciens_.push_back(make_shared<Instrumentiste>(musicien, fichierTypesMusiciens));
 			return make_shared<Instrumentiste>(musicien, fichierTypesMusiciens);
 		}
 		else if (typeMusicien == "chant+instrument")
 		{
-			musicien.vectorTousMusiciens_.push_back(make_shared<ChanteurInstrumentiste>(musicien, fichierTypesMusiciens));
 			return make_shared<ChanteurInstrumentiste>(musicien, fichierTypesMusiciens);
 		}
 	}
 	erreurFataleAssert("Type de musicien inconnu ou nom inattendu dans le fichier de types.");
 
-	musicien.afficherVectorTousMusiciens(musicien.vectorTousMusiciens_);
 }
 
-template <typename U>
-void Musicien::afficherVectorTousMusiciens(U vectorTousMusiciens)
-{
-	for (auto musicien: vectorTousMusiciens) {
-		cout << musicien;
-	}
-}
 Groupe* lireGroupe(istream& fichier, istream& fichierTypesMusiciens, const ListeGroupes& liste)
 {
 	string nom = lireString(fichier);
@@ -431,17 +420,40 @@ void verifierDestruction(const ListeGroupes& listeGroupes)
 
 }
 
+
+template <typename Conteneur>
+void afficherMusiciens(const string& titre, const Conteneur& conteneur)
+{
+	cout <<titre << endl;
+	for (const auto& musicien : conteneur)
+	{
+		if (musicien != nullptr)
+			cout << *musicien;
+	}
+	cout << endl;
+}
+
 int main()
 {
 	bibliotheque_cours::activerCouleursAnsi(); // Permet sous Windows les "ANSI escape code" pour changer de couleurs https://en.wikipedia.org/wiki/ANSI_escape_code ; les consoles Linux/Mac les supportent normalement par défaut.
 
 	static const string ligneDeSeparation = "\n\033[35m════════════════════════════════════════\033[0m\n";
 	
-
 	ifstream fichierTypesMusiciens("types_musiciens.txt");
-
 	ListeGroupes listeGroupes = creerListe("groupes.bin", fichierTypesMusiciens);
 
+	// 0.2 
+	vector<shared_ptr<Musicien>> tousLesMusiciens; 
+	for (const Groupe* groupe : listeGroupes.getGroupes())
+	{
+		for (const auto& musicien : groupe->membres.getElements())
+		{
+			tousLesMusiciens.push_back(musicien); 
+		}
+	}
+
+	// 0.3 
+	afficherMusiciens("Partie du TD: 0.3", tousLesMusiciens);
 
 
 	detruireListeGroupes(listeGroupes);
