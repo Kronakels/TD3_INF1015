@@ -451,6 +451,34 @@ forward_list<shared_ptr<Musicien>> copierEnListeLieeEnvers(const forward_list<sh
 	return resultat;
 }
 
+forward_list<shared_ptr<Musicien>> copierEnListeLieeMeme(const forward_list<shared_ptr<Musicien>>& source)
+{
+	forward_list<shared_ptr<Musicien>> forwardListeMusicien;
+	auto position = forwardListeMusicien.before_begin();
+	for (const shared_ptr<Musicien>& musicien : source)
+	{
+		position = forwardListeMusicien.insert_after(position, musicien);
+	}
+	return forwardListeMusicien;
+}
+
+vector<shared_ptr<Musicien>> copierEnVecteurEnvers(const forward_list<shared_ptr<Musicien>>& source)
+//copie en O(n)
+{
+	vector<shared_ptr<Musicien>> musiciens;
+	int nElementsSource = 0;
+	for (const shared_ptr<Musicien>& musicien : source) nElementsSource++;
+	musiciens.resize(nElementsSource);
+	int i = nElementsSource - 1;
+	for (const shared_ptr<Musicien>& musicien : source)
+	{
+		musiciens[i] = musicien;
+		i--;
+	}
+	return musiciens;
+}
+
+
 template <typename V>
 void affichage(const V& conteneur)
 {
@@ -472,11 +500,17 @@ int main()
 	vector<shared_ptr<Musicien>> vecteurMusiciens = copierTousMusiciensVecteur(listeGroupes);
 	forward_list<shared_ptr<Musicien>> forwardListeMusicien = copierEnListeLiee(vecteurMusiciens);
 	forward_list<shared_ptr<Musicien>> forwardListeMusicienEnvers = copierEnListeLieeEnvers(forwardListeMusicien);
+	forward_list<shared_ptr<Musicien>> forwardListeMusicienCopie = copierEnListeLieeMeme(forwardListeMusicien);
+	vector<shared_ptr<Musicien>> vecteurMusiciensCopieEnvers = copierEnVecteurEnvers(forwardListeMusicien);
 	cout << "affichage vecteur musiciens: " << endl;
 	affichage(vecteurMusiciens);
 	cout << "affichage forward_list musiciens: " << endl;
 	affichage(forwardListeMusicien);
 	cout << "affichage à de l'envers de forward_list musiciens: " << endl;
 	affichage(forwardListeMusicienEnvers);
+	cout << "affichage de la copie du sens identique de la forward_list de musiciens: " << endl;
+	affichage(forwardListeMusicienCopie);
+	cout << "affichage de la copie sous forme de vecteur dans l'ordre inverse: " << endl;
+	affichage(vecteurMusiciensCopieEnvers);
 	detruireListeGroupes(listeGroupes);
 }
