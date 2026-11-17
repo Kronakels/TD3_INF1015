@@ -112,6 +112,11 @@ public:
 		return std::span<const std::shared_ptr<T>>(elements_.get(), nElements_);
 	}
 
+
+	Iterateur begin() const { return Iterateur(elements_.get()); }
+
+	Iterateur end()   const { return Iterateur(elements_.get() + nElements_); }
+
 private:
 	int capacite_, nElements_;
 	std::unique_ptr<std::shared_ptr<T>[]> elements_;
@@ -125,12 +130,15 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const Affichable& obj);
 };
 
+
 class Musicien : public Affichable
 {
 public:
 	~Musicien() override;
 	friend std::shared_ptr<Musicien> lireMusicien(std::istream& fichier, std::istream& fichierTypes, const ListeGroupes& liste);
 	friend std::shared_ptr<Musicien> ListeGroupes::trouverMusicien(const std::string& nom) const;
+	friend struct ComparateurNom;
+	const std::string& getNom() const { return nom_; }
 	std::ostream& afficher(std::ostream& os) const override;
 	friend int main();
 
@@ -185,4 +193,12 @@ struct Groupe
 	std::string nom, genre; // Nom du groupe et genre de musique qu'il fait principalement.
 	int anneeFormation = 0; // Année où le groupe a été formé initialement.
 	ListeMusiciens membres;
+};
+
+struct ComparateurNom
+{
+	bool operator()(const std::shared_ptr<Musicien>& a, const std::shared_ptr<Musicien>& b) const
+	{
+		return a->nom_ < b->nom_;
+	}
 };

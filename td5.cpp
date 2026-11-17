@@ -11,7 +11,8 @@
 #define _CRT_SECURE_NO_WARNINGS // On permet d'utiliser les fonctions de copies de chaînes qui sont considérées non sécuritaires.
 
 #include "structures.hpp" // Structures de données pour la collection de groupes musicaux en mémoire.
-
+#include <set>
+#include <unordered_set>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -478,6 +479,27 @@ vector<shared_ptr<Musicien>> copierEnVecteurEnvers(const forward_list<shared_ptr
 	return musiciens;
 }
 
+multiset<shared_ptr<Musicien>, ComparateurNom> copierEnMultisetTrie(const vector<shared_ptr<Musicien>>& musiciens)
+{
+	return multiset<shared_ptr<Musicien>, ComparateurNom>(musiciens.begin(), musiciens.end());
+}
+
+vector<shared_ptr<Musicien>> copierVecteurSansDoublon(const vector<shared_ptr<Musicien>>& musiciens)
+//copie en O(n)
+{
+	vector<shared_ptr<Musicien>> CopieUnique;
+	unordered_set<Musicien*> dejavus;
+	for (const shared_ptr<Musicien> musicien : musiciens)
+	{
+		if (!dejavus.contains(musicien.get()))
+		{
+			dejavus.insert(musicien.get());
+			CopieUnique.push_back(musicien);
+		}
+	}
+	return CopieUnique;
+}
+
 
 template <typename V>
 void affichage(const V& conteneur)
@@ -498,10 +520,12 @@ int main()
 
 	ListeGroupes listeGroupes = creerListe("groupes.bin", fichierTypesMusiciens);
 	vector<shared_ptr<Musicien>> vecteurMusiciens = copierTousMusiciensVecteur(listeGroupes);
+	vector<shared_ptr<Musicien>> vecteurMusiciensSansDoublon = copierVecteurSansDoublon(vecteurMusiciens);
 	forward_list<shared_ptr<Musicien>> forwardListeMusicien = copierEnListeLiee(vecteurMusiciens);
 	forward_list<shared_ptr<Musicien>> forwardListeMusicienEnvers = copierEnListeLieeEnvers(forwardListeMusicien);
 	forward_list<shared_ptr<Musicien>> forwardListeMusicienCopie = copierEnListeLieeMeme(forwardListeMusicien);
 	vector<shared_ptr<Musicien>> vecteurMusiciensCopieEnvers = copierEnVecteurEnvers(forwardListeMusicien);
+	const Groupe& nirvana = *listeGroupes.getGroupes()[0];
 	cout << "affichage vecteur musiciens: " << endl;
 	affichage(vecteurMusiciens);
 	cout << "affichage forward_list musiciens: " << endl;
@@ -511,8 +535,16 @@ int main()
 	cout << "affichage de la copie du sens identique de la forward_list de musiciens: " << endl;
 	affichage(forwardListeMusicienCopie);
 	cout << "affichage de la copie sous forme de vecteur dans l'ordre inverse: " << endl;
-	cout << "itération sur Nirvana: " << endl;
-	for (auto&& musicien: listeGroupes.getGroupes().first())
 	affichage(vecteurMusiciensCopieEnvers);
+	cout << "itération sur Nirvana: " << endl;
+	for (auto&& musicien : nirvana.membres)
+	{
+		cout << *musicien << endl;
+	}
+	auto musiciensTries = copierEnMultisetTrie(vecteurMusiciens);
+	cout << "musiciens en ordre alphabétique: " << endl;
+	affichage(musiciensTries);
+	cout << "affichage de la copie de vecteur musiciens sans doublon: " << endl;
+	affichage(vecteurMusiciensSansDoublon);
 	detruireListeGroupes(listeGroupes);
 }
