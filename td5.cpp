@@ -478,5 +478,35 @@ int main()
 	}
 	afficherMusiciens("Partie du TD: 1.3", listeMusiciensCopie);
 
+	// 1.4     Ordre de O(n)
+	vector<shared_ptr<Musicien>> vectorListeMusiciensInverse;
+	int nElements = 0;
+	for (const auto& element : listeMusiciens) {
+		nElements++;
+	}
+	vectorListeMusiciensInverse.resize(nElements);
+
+	auto it2 = listeMusiciens.begin();
+	for (int i : range(nElements)) {
+		vectorListeMusiciensInverse[(nElements - 1) - i] = *it2;
+		++it2;
+	}
+	afficherMusiciens("Partie du TD: 1.4", vectorListeMusiciensInverse);
+
+	// 1.5
+	cout << "---------- " << "Partie du TD: 1.5" << " ----------" << endl;
+	auto groupe = listeGroupes.getGroupes();
+	if (!groupe.empty()) {
+		for (auto&& musicien : groupe[0]->membres.getElements()) {
+			cout << *musicien;
+		}
+	}
+	cout << endl;
+
+
+
+	
+
+
 	detruireListeGroupes(listeGroupes);
 }
