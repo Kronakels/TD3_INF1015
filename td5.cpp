@@ -22,6 +22,10 @@
 #include <iomanip>
 #include <typeinfo>
 #include <forward_list>
+#include <set>
+#include <memory>
+#include <vector>
+#include <istream>
 #include "cppitertools/range.hpp"
 
 #include "bibliotheque_cours.hpp"
@@ -433,6 +437,13 @@ void afficherMusiciens(const string& titre, const Conteneur& conteneur)
 	cout << endl;
 }
 
+struct ComparaisonNomMusicien {
+	bool operator() (const shared_ptr<Musicien>& a, const shared_ptr<Musicien>& b) const
+	{
+		return a->getNom() < b->getNom();
+	}
+};
+
 int main()
 {
 	bibliotheque_cours::activerCouleursAnsi(); // Permet sous Windows les "ANSI escape code" pour changer de couleurs https://en.wikipedia.org/wiki/ANSI_escape_code ; les consoles Linux/Mac les supportent normalement par défaut.
@@ -502,6 +513,14 @@ int main()
 		}
 	}
 	cout << endl;
+
+	// 2.1
+	multiset<shared_ptr<Musicien>, ComparaisonNomMusicien> musiciensTries;
+
+	for (const auto& musicien : tousLesMusiciens)
+		musiciensTries.insert(musicien);
+
+	afficherMusiciens("Partie du TD: 2.1", musiciensTries);
 
 
 

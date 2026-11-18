@@ -101,6 +101,7 @@ public:
 	~Musicien() override;
 	friend std::shared_ptr<Musicien> lireMusicien(std::istream& fichier, std::istream& fichierTypes, const ListeGroupes& liste);
 	friend std::shared_ptr<Musicien> ListeGroupes::trouverMusicien(const std::string& nom) const;
+	const std::string& getNom() const { return nom_; }
 	std::ostream& afficher(std::ostream& os) const override;
 	friend int main();
 
