@@ -24,6 +24,8 @@
 #include <typeinfo>
 #include <forward_list>
 #include <ranges>
+#include <iterator>
+#include <ranges>
 
 #include "cppitertools/range.hpp"
 
@@ -446,7 +448,7 @@ forward_list<shared_ptr<Musicien>> copierEnListeLiee(const vector<shared_ptr<Mus
 forward_list<shared_ptr<Musicien>> copierEnListeLieeEnvers(const forward_list<shared_ptr<Musicien>>& source)
 {
 	forward_list<shared_ptr<Musicien>> resultat;
-	for (const shared_ptr<Musicien> musicien : source)
+	for (const shared_ptr<Musicien>& musicien : source)
 	{
 		resultat.push_front(musicien);
 	}
@@ -488,17 +490,17 @@ multiset<shared_ptr<Musicien>, ComparateurNom> copierEnMultisetTrie(const vector
 vector<shared_ptr<Musicien>> copierVecteurSansDoublon(const vector<shared_ptr<Musicien>>& musiciens)
 //copie en O(n)
 {
-	vector<shared_ptr<Musicien>> CopieUnique;
-	unordered_set<Musicien*> dejavus;
+	vector<shared_ptr<Musicien>> copieUnique;
+	unordered_set<Musicien*> dejaVus;
 	for (const shared_ptr<Musicien> musicien : musiciens)
 	{
-		if (!dejavus.contains(musicien.get()))
+		if (!dejaVus.contains(musicien.get()))
 		{
-			dejavus.insert(musicien.get());
-			CopieUnique.push_back(musicien);
+			dejaVus.insert(musicien.get());
+			copieUnique.push_back(musicien);
 		}
 	}
-	return CopieUnique;
+	return copieUnique;
 }
 
 
@@ -529,12 +531,11 @@ int main()
 	const Groupe& nirvana = *listeGroupes.getGroupes()[0];
 
 	cout << "affichage vecteur musiciens: " << endl;
-	affichage(vecteurMusiciens)
-		;
+	affichage(vecteurMusiciens);
 	cout << "affichage forward_list musiciens: " << endl;
 	affichage(forwardListeMusicien);
 
-	cout << "affichage à de l'envers de forward_list musiciens: " << endl;
+	cout << "affichage à l'envers de forward_list musiciens: " << endl;
 	affichage(forwardListeMusicienEnvers);
 
 	cout << "affichage de la copie du sens identique de la forward_list de musiciens: " << endl;
@@ -557,7 +558,7 @@ int main()
 	affichage(vecteurMusiciensSansDoublon);
 
 	vector<shared_ptr<Musicien>> chanteurs;
-	ranges::copy_if(vecteurMusiciens, back_inserter(chanteurs),
+	ranges::copy_if(forwardListeMusicien, back_inserter(chanteurs),
 		[](const shared_ptr<Musicien>& musicien) { return dynamic_cast<Chanteur*>(musicien.get()) != nullptr; });
 	cout << "affichage des chanteurs via copy_if: " << endl;
 	affichage(chanteurs);
