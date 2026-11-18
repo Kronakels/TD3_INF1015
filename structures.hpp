@@ -15,6 +15,7 @@
 #include <functional>
 #include <vector>
 #include <istream>
+#include <algorithm>
 
 #include "cppitertools/range.hpp"
 
@@ -167,6 +168,7 @@ public:
 	~Chanteur() override;
 	Chanteur(const Musicien& musicien, std::istream& fichier);
 	std::ostream& afficher(std::ostream& os) const override;
+	const std::string& getStyleVocal() const { return styleVocal_; }
 
 protected:
 	std::ostream& afficherInterne(std::ostream& os) const;

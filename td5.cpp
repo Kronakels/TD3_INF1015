@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <typeinfo>
 #include <forward_list>
+#include <ranges>
 
 #include "cppitertools/range.hpp"
 
@@ -526,25 +527,43 @@ int main()
 	forward_list<shared_ptr<Musicien>> forwardListeMusicienCopie = copierEnListeLieeMeme(forwardListeMusicien);
 	vector<shared_ptr<Musicien>> vecteurMusiciensCopieEnvers = copierEnVecteurEnvers(forwardListeMusicien);
 	const Groupe& nirvana = *listeGroupes.getGroupes()[0];
+
 	cout << "affichage vecteur musiciens: " << endl;
-	affichage(vecteurMusiciens);
+	affichage(vecteurMusiciens)
+		;
 	cout << "affichage forward_list musiciens: " << endl;
 	affichage(forwardListeMusicien);
+
 	cout << "affichage à de l'envers de forward_list musiciens: " << endl;
 	affichage(forwardListeMusicienEnvers);
+
 	cout << "affichage de la copie du sens identique de la forward_list de musiciens: " << endl;
 	affichage(forwardListeMusicienCopie);
+
 	cout << "affichage de la copie sous forme de vecteur dans l'ordre inverse: " << endl;
 	affichage(vecteurMusiciensCopieEnvers);
+
 	cout << "itération sur Nirvana: " << endl;
 	for (auto&& musicien : nirvana.membres)
 	{
 		cout << *musicien << endl;
 	}
-	auto musiciensTries = copierEnMultisetTrie(vecteurMusiciens);
+
+	multiset<shared_ptr<Musicien>, ComparateurNom> musiciensTries = copierEnMultisetTrie(vecteurMusiciens);
 	cout << "musiciens en ordre alphabétique: " << endl;
 	affichage(musiciensTries);
+
 	cout << "affichage de la copie de vecteur musiciens sans doublon: " << endl;
 	affichage(vecteurMusiciensSansDoublon);
+
+	vector<shared_ptr<Musicien>> chanteurs;
+	ranges::copy_if(vecteurMusiciens, back_inserter(chanteurs),
+		[](const shared_ptr<Musicien>& musicien) { return dynamic_cast<Chanteur*>(musicien.get()) != nullptr; });
+	cout << "affichage des chanteurs via copy_if: " << endl;
+	affichage(chanteurs);
+
+	cout << "style vocal minimal: " << endl;
+	cout << ranges::min(chanteurs | views::transform([](const shared_ptr<Musicien>& m) { return dynamic_pointer_cast<Chanteur>(m)->getStyleVocal(); })) << endl;
+
 	detruireListeGroupes(listeGroupes);
 }
